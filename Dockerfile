@@ -21,7 +21,7 @@ ENV CLUB_DB_USERNAME    chess
 ENV CLUB_DB_PASSWORD    chess
 ENV CLUB_DB_TYPE        H2
 ENV CLUB_DB_DDL         update
-ENV CLUB_PROFILES       jobs,integration,mail
+ENV CLUB_PROFILES       jobs,integration
 ENV CLUB_MAIL_HOST      localhost
 ENV CLUB_MAIL_PORT      25
 ENV CLUB_MAIL_SENDER    contact@mail.chesscorp.org
