@@ -15,17 +15,27 @@ RUN /usr/local/chesscorp/src/main/scripts/docker_build.sh
 EXPOSE 80
 VOLUME /data
 
-ENV dburl      jdbc:h2:file:/data/chess1
-ENV dbusername chess
-ENV dbpassword chess
-ENV dbdatabase H2
-ENV dbddl      update
+ENV CLUB_BASEURL        http://chesscorp.org/
+ENV CLUB_DB_URL         jdbc:h2:file:/data/chess1
+ENV CLUB_DB_USERNAME    chess
+ENV CLUB_DB_PASSWORD    chess
+ENV CLUB_DB_TYPE        H2
+ENV CLUB_DB_DDL         update
+ENV CLUB_PROFILES       jobs,integration,mail
+ENV CLUB_MAIL_HOST      localhost
+ENV CLUB_MAIL_PORT      25
+ENV CLUB_MAIL_SENDER    contact@mail.chesscorp.org
 
 CMD java \
      -Dserver.port=80 \
-     -Dspring.datasource.url=${dburl}		\
-     -Dspring.datasource.username=${dbusername}	\
-     -Dspring.datasource.password=${dbpassword}	\
-     -Dspring.jpa.database=${dbdatabase}	\
-     -Dspring.jpa.hibernate.ddl-auto=${dbddl}	\
+     -Dspring.datasource.url=${CLUB_DB_URL}    \
+     -Dspring.datasource.username=${CLUB_DB_USERNAME} \
+     -Dspring.datasource.password=${CLUB_DB_PASSWORD} \
+     -Dspring.jpa.database=${CLUB_DB_TYPE}	   \
+     -Dspring.jpa.hibernate.ddl-auto=${CLUB_DB_DDL} \
+     -Dspring.profiles.active=${CLUB_PROFILES} \
+     -Dspring.mail.host=${CLUB_MAIL_HOST}      \
+     -Dspring.mail.port=${CLUB_MAIL_PORT}      \
+     -Dchesscorp.mail.sender=${CLUB_MAIL_SENDER} \
+     -Dchesscorp.mail.baseUrl=${CLUB_BASEURL} \
      -jar /usr/local/chesscorp/target/chess-club-*.jar
