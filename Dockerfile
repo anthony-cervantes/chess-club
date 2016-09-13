@@ -25,8 +25,10 @@ ENV CLUB_PROFILES       jobs,integration
 ENV CLUB_MAIL_HOST      localhost
 ENV CLUB_MAIL_PORT      25
 ENV CLUB_MAIL_SENDER    contact@mail.chesscorp.org
+ENV JAVA_OPTS           -Xmx2G
 
 CMD java \
+     ${JAVA_OPTS} \
      -Dserver.port=80 \
      -Dspring.datasource.url=${CLUB_DB_URL}    \
      -Dspring.datasource.username=${CLUB_DB_USERNAME} \
