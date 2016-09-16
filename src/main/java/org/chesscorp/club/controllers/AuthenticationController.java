@@ -1,6 +1,7 @@
 package org.chesscorp.club.controllers;
 
 import org.chesscorp.club.dto.AuthenticationResult;
+import org.chesscorp.club.exception.AuthenticationFailedException;
 import org.chesscorp.club.model.people.Account;
 import org.chesscorp.club.model.people.Player;
 import org.chesscorp.club.model.people.Session;
@@ -30,26 +31,31 @@ public class AuthenticationController {
     @Transactional
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public AuthenticationResult signup(
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String displayName) {
+        @RequestParam String email,
+        @RequestParam String password,
+        @RequestParam String displayName) {
         logger.debug("Signing up user {}", email);
         authenticationService.signup(email, password, displayName);
 
-        String token = authenticationService.signin(email, password);
+        try {
+            String token = authenticationService.signin(email, password);
 
-        Session session = authenticationService.getSession(token);
-        Account account = session.getAccount();
-        Player player = account.getPlayer();
+            Session session = authenticationService.getSession(token);
+            Account account = session.getAccount();
+            Player player = account.getPlayer();
 
-        return new AuthenticationResult(token, account, player);
+            return new AuthenticationResult(token, account, player);
+        } catch (AuthenticationFailedException e) {
+            // If email validation is enforced, authentication is not enabled at this stage.
+            return null;
+        }
     }
 
     @Transactional
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public AuthenticationResult signin(
-            @RequestParam String email,
-            @RequestParam String password) {
+        @RequestParam String email,
+        @RequestParam String password) {
         logger.debug("Authenticating user {}", email);
 
         String token = authenticationService.signin(email, password);
@@ -64,7 +70,7 @@ public class AuthenticationController {
     @Transactional
     @RequestMapping(value = "/validate", method = RequestMethod.POST)
     public void validateAccount(
-            @RequestParam String tokenText) {
+        @RequestParam String tokenText) {
         logger.debug("Validating account token {}", tokenText);
 
         authenticationService.validateAccount(tokenText);
@@ -73,9 +79,9 @@ public class AuthenticationController {
     @Transactional
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     public void updatePassword(
-            @CookieValue(value = AUTHENTICATION_TOKEN) String token,
-            @RequestParam String currentPassword,
-            @RequestParam String newPassword) {
+        @CookieValue(value = AUTHENTICATION_TOKEN) String token,
+        @RequestParam String currentPassword,
+        @RequestParam String newPassword) {
         Session session = authenticationService.getSession(token);
         Account account = session.getAccount();
 

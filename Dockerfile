@@ -25,6 +25,7 @@ ENV CLUB_PROFILES       jobs,integration
 ENV CLUB_MAIL_HOST      localhost
 ENV CLUB_MAIL_PORT      25
 ENV CLUB_MAIL_SENDER    contact@mail.chesscorp.org
+ENV CLUB_VALIDATION_REQ true
 ENV JAVA_OPTS           -Xmx2G
 
 CMD java \
@@ -39,5 +40,6 @@ CMD java \
      -Dspring.mail.host=${CLUB_MAIL_HOST}      \
      -Dspring.mail.port=${CLUB_MAIL_PORT}      \
      -Dchesscorp.mail.sender=${CLUB_MAIL_SENDER} \
-     -Dchesscorp.mail.baseUrl=${CLUB_BASEURL} \
+     -Dchesscorp.mail.baseUrl=${CLUB_BASEURL}    \
+     -Dchesscorp.account.validationRequired=${CLUB_VALIDATION_REQ}  \
      -jar /usr/local/chesscorp/target/chess-club-*.jar

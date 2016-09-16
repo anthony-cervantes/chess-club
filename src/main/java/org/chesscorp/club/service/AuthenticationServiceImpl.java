@@ -55,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                      SessionRepository sessionRepository, HashManager hashManager,
                                      GravatarHashManager gravatarHashManager, MailService mailService,
                                      TokenService tokenService, TokenGenerator tokenGenerator,
-                                     @Value("${chesscorp.account.validationRequired}") Boolean mandatoryValidation) {
+                                     @Value("${chesscorp.account.validationRequired:false}") Boolean mandatoryValidation) {
         this.accountRepository = accountRepository;
         this.playerRepository = playerRepository;
         this.sessionRepository = sessionRepository;
@@ -83,7 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public void signup(String email, String password, String displayName) {
+    public Token signup(String email, String password, String displayName) {
         if (accountRepository.exists(email)) {
             throw new UserAlreadyExistsException();
         }
@@ -98,6 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Token token = tokenService.registerToken(TokenType.ACCOUNT_VALIDATION, a.getIdentifier(), 30);
         mailService.sendAccountValidationLink(displayName, email, token.getText());
+        return token;
     }
 
     @Override
