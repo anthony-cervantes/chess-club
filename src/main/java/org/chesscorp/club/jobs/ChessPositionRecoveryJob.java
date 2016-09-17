@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Re-start stale robot moves.
+ * Evaluate all positions which do not have evaluation metadata yet.
  */
 @Component
 public class ChessPositionRecoveryJob {
