@@ -1,10 +1,12 @@
 package org.chesscorp.club.model.game;
 
+import org.alcibiade.chess.model.ChessGameStatus;
 import org.assertj.core.api.Assertions;
 import org.chesscorp.club.model.people.ClubPlayer;
 import org.junit.Test;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 
 /**
  * Validate the move model.
@@ -15,14 +17,14 @@ public class ChessMoveTest {
     public void testEquality() {
         OffsetDateTime moveTime = OffsetDateTime.now();
 
-        ChessGame game1 = new ChessGame(new ClubPlayer("White"), new ClubPlayer("Black"));
+        ChessGame game1 = new ChessGame(new ClubPlayer("White"), new ClubPlayer("Black"), new ArrayList<>(), ChessGameStatus.OPEN, moveTime);
         ChessMove move11 = game1.addMove(moveTime, "e4");
         ChessMove move12 = game1.addMove(moveTime, "e5");
         Assertions.assertThat(move11).isNotEqualTo(move12);
 
-        ChessGame game2 = new ChessGame(new ClubPlayer("White"), new ClubPlayer("Black"));
+        ChessGame game2 = new ChessGame(new ClubPlayer("White"), new ClubPlayer("Black"), new ArrayList<>(), ChessGameStatus.OPEN, moveTime);
         ChessMove move21 = game2.addMove(moveTime, "e4");
-        Assertions.assertThat(move11).isNotEqualTo(move21);
+        Assertions.assertThat(move11).isEqualTo(move21);
     }
 
     @Test
