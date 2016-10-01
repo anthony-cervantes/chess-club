@@ -5,7 +5,7 @@ package org.chesscorp.club.service;
  */
 public interface BootstrapService {
 
-    void populate();
+    void populate(boolean robots, boolean players, boolean games);
 
     void fixPgnNotationInGames();
 }

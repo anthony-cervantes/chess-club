@@ -45,14 +45,25 @@ public class BootstrapServiceTest {
     @Test
     @Transactional
     public void testSampleData() {
-        bootstrapService.populate();
+        bootstrapService.populate(true, true, true);
 
         Assertions.assertThat(playerRepository.findAll()).hasSize(19)
-                .hasAtLeastOneElementOfType(RobotPlayer.class)
-                .hasAtLeastOneElementOfType(ClubPlayer.class);
+            .hasAtLeastOneElementOfType(RobotPlayer.class)
+            .hasAtLeastOneElementOfType(ClubPlayer.class);
         Assertions.assertThat(accountRepository.findAll()).hasSize(4);
         Assertions.assertThat(robotRepository.findAll()).hasSize(15);
         Assertions.assertThat(chessGameRepository.findAll()).hasSize(2);
+    }
+
+    @Test
+    @Transactional
+    public void testNoData() {
+        bootstrapService.populate(false, false, false);
+
+        Assertions.assertThat(playerRepository.findAll()).isEmpty();
+        Assertions.assertThat(accountRepository.findAll()).isEmpty();
+        Assertions.assertThat(robotRepository.findAll()).isEmpty();
+        Assertions.assertThat(chessGameRepository.findAll()).isEmpty();
     }
 
     @Test

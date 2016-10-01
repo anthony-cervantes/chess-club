@@ -34,11 +34,11 @@ public class BootstrapServiceTestCrafty {
     @Test
     @Transactional
     public void testSampleData() {
-        bootstrapService.populate();
+        bootstrapService.populate(true, true, true);
 
         Assertions.assertThat(playerRepository.findAll()).hasSize(26)
-                .hasAtLeastOneElementOfType(RobotPlayer.class)
-                .hasAtLeastOneElementOfType(ClubPlayer.class);
+            .hasAtLeastOneElementOfType(RobotPlayer.class)
+            .hasAtLeastOneElementOfType(ClubPlayer.class);
         Assertions.assertThat(robotRepository.findAll()).hasSize(22);
     }
 

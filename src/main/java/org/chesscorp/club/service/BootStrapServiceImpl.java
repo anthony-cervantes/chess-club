@@ -56,7 +56,7 @@ public class BootStrapServiceImpl implements BootstrapService {
 
     @Override
     @Transactional
-    public void populate() {
+    public void populate(boolean robots, boolean players, boolean games) {
         long playerCount = playerRepository.count();
         long gameCount = chessGameRepository.count();
         long accountCount = accountRepository.count();
@@ -64,34 +64,40 @@ public class BootStrapServiceImpl implements BootstrapService {
         logger.info("Found {} accounts, {} players, {} games", accountCount, playerCount, gameCount);
 
         if (playerCount == 0 && gameCount == 0 && accountCount == 0) {
-            logger.info("Creating sample robots");
-            robotRepository.save(new RobotPlayer("Simple AI", "randomAI", ""));
+            if (robots) {
+                logger.info("Creating sample robots");
+                robotRepository.save(new RobotPlayer("Simple AI", "randomAI", ""));
 
-            for (int l = 1; l < 8; l++) {
-                robotRepository.save(new RobotPlayer("GnuChess Level " + l, "gnuchessAI", Integer.toString(l), true));
-                robotRepository.save(new RobotPlayer("Phalanx Level " + l, "phalanxAI", Integer.toString(l), true));
-                if (environment.acceptsProfiles("ai-crafty")) {
-                    // This should only occur if the ai-crafty profile is set
-                    robotRepository.save(new RobotPlayer("Crafty Level " + l, "craftyAI", Integer.toString(l), true));
+                for (int l = 1; l < 8; l++) {
+                    robotRepository.save(new RobotPlayer("GnuChess Level " + l, "gnuchessAI", Integer.toString(l), true));
+                    robotRepository.save(new RobotPlayer("Phalanx Level " + l, "phalanxAI", Integer.toString(l), true));
+                    if (environment.acceptsProfiles("ai-crafty")) {
+                        // This should only occur if the ai-crafty profile is set
+                        robotRepository.save(new RobotPlayer("Crafty Level " + l, "craftyAI", Integer.toString(l), true));
+                    }
                 }
             }
 
-            logger.info("Creating sample players");
-            Player alcibiade = playerRepository.save(new ClubPlayer("Alcibiade"));
-            Player john = playerRepository.save(new ClubPlayer("John"));
-            Player bob = playerRepository.save(new ClubPlayer("Bob"));
-            Player steve = playerRepository.save(new ClubPlayer("Steve"));
+            if (players) {
+                logger.info("Creating sample players");
+                Player alcibiade = playerRepository.save(new ClubPlayer("Alcibiade"));
+                Player john = playerRepository.save(new ClubPlayer("John"));
+                Player bob = playerRepository.save(new ClubPlayer("Bob"));
+                Player steve = playerRepository.save(new ClubPlayer("Steve"));
 
-            logger.info("Creating sample games");
-            chessGameRepository.save(new ChessGame(playerRepository.getOne(john.getId()), playerRepository.getOne(bob.getId())));
-            chessGameRepository.save(new ChessGame(playerRepository.getOne(alcibiade.getId()), playerRepository.getOne(bob.getId())));
+                logger.info("Creating sample accounts");
+                String salt = hashManager.createSalt();
+                accountRepository.save(new Account("alcibiade", salt, hashManager.hash(salt, "toto"), alcibiade));
+                accountRepository.save(new Account("john", salt, hashManager.hash(salt, "john"), john));
+                accountRepository.save(new Account("bob", salt, hashManager.hash(salt, "bob"), bob));
+                accountRepository.save(new Account("steve", salt, hashManager.hash(salt, "steve"), steve));
 
-            logger.info("Creating sample accounts");
-            String salt = hashManager.createSalt();
-            accountRepository.save(new Account("alcibiade", salt, hashManager.hash(salt, "toto"), alcibiade));
-            accountRepository.save(new Account("john", salt, hashManager.hash(salt, "john"), john));
-            accountRepository.save(new Account("bob", salt, hashManager.hash(salt, "bob"), bob));
-            accountRepository.save(new Account("steve", salt, hashManager.hash(salt, "steve"), steve));
+                if (games) {
+                    logger.info("Creating sample games");
+                    chessGameRepository.save(new ChessGame(playerRepository.getOne(john.getId()), playerRepository.getOne(bob.getId())));
+                    chessGameRepository.save(new ChessGame(playerRepository.getOne(alcibiade.getId()), playerRepository.getOne(bob.getId())));
+                }
+            }
         }
     }
 
@@ -103,9 +109,9 @@ public class BootStrapServiceImpl implements BootstrapService {
 
             for (ChessMove move : g.getMoves()) {
                 logger.debug("Checking pgn validity for game {}: {} vs {}",
-                        g.getId(),
-                        g.getWhitePlayer().getDisplayName(),
-                        g.getBlackPlayer().getDisplayName());
+                    g.getId(),
+                    g.getWhitePlayer().getDisplayName(),
+                    g.getBlackPlayer().getDisplayName());
 
                 String originalPgn = move.getPgn();
                 ChessMovePath movePath = pgnMarshaller.convertPgnToMove(position, originalPgn);
