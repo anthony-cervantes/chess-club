@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.thymeleaf.spring4.SpringTemplateEngine;
 
 /**
- * Test message sending.
+ * Test message templates.
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -19,15 +20,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class TemplateServiceTest {
 
     @Autowired
-    private TemplateService templateService;
+    private SpringTemplateEngine templateEngine;
 
     /**
      * Build a simple template.
      */
     @Test
     public void testAccountValidation() {
+        TemplateServiceImpl templateService = new TemplateServiceImpl(templateEngine, "http://localhost/");
+
         String html = templateService.buildEmailAccountValidation("John Doe", "###Token###");
-        Assertions.assertThat(html).contains("John Doe");
-        Assertions.assertThat(html).contains("###Token###");
+        Assertions.assertThat(html)
+            .contains("John Doe")
+            .contains(" href=\"http://localhost/#!/accountValidation/###Token###\"");
     }
 }

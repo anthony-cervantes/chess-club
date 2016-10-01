@@ -10,7 +10,7 @@
 <p>Hello <span th:text="${recipientName}">recipient</span></p>
 
 <p>To validate your ChessCorp account, use the following link:
-    <span th:text="${baseUrl}">baseurl</span>#!/accountValidation/<span th:text="${token}">token</span>
+    <a th:href="${baseUrl} + '#!/accountValidation/' + ${token}">Validate my email address</a>
 </p>
 </body>
 
