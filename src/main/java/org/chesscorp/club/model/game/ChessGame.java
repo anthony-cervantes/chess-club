@@ -9,7 +9,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Chess game data model.
@@ -19,9 +18,9 @@ import java.util.Objects;
 @Entity
 @Proxy(lazy = false)
 @Table(
-        indexes = {
-                @Index(columnList = "whiteplayer_id,blackplayer_id", unique = false)
-        }
+    indexes = {
+        @Index(columnList = "whiteplayer_id,blackplayer_id", unique = false)
+    }
 )
 @SequenceGenerator(name = "chessgame_seq", initialValue = 1, allocationSize = 1, sequenceName = "chessgame_seq")
 public class ChessGame {
@@ -141,33 +140,37 @@ public class ChessGame {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 73 * hash + Objects.hashCode(this.id);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChessGame chessGame = (ChessGame) o;
+
+        if (id != null ? !id.equals(chessGame.id) : chessGame.id != null) return false;
+        if (!whitePlayer.equals(chessGame.whitePlayer)) return false;
+        if (!blackPlayer.equals(chessGame.blackPlayer)) return false;
+        return startDate.equals(chessGame.startDate);
+
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ChessGame other = (ChessGame) obj;
-        return Objects.equals(this.id, other.id);
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + whitePlayer.hashCode();
+        result = 31 * result + blackPlayer.hashCode();
+        result = 31 * result + startDate.hashCode();
+        return result;
     }
 
     @Override
     public String toString() {
         return "ChessGame{" +
-                "id='" + id + '\'' +
-                ", whitePlayer=" + whitePlayer +
-                ", blackPlayer=" + blackPlayer +
-                ", movesCount=" + moves.size() +
-                ", startDate=" + startDate +
-                ", status=" + status +
-                '}';
+            "id='" + id + '\'' +
+            ", whitePlayer=" + whitePlayer +
+            ", blackPlayer=" + blackPlayer +
+            ", movesCount=" + moves.size() +
+            ", startDate=" + startDate +
+            ", status=" + status +
+            '}';
     }
 }

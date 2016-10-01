@@ -65,12 +65,16 @@ public class ChessMove {
 
         ChessMove chessMove = (ChessMove) o;
 
-        return id.equals(chessMove.id) && pgn.equals(chessMove.pgn) && date.equals(chessMove.date);
+        if (id != null ? !id.equals(chessMove.id) : chessMove.id != null) return false;
+        if (!game.equals(chessMove.game)) return false;
+        if (!pgn.equals(chessMove.pgn)) return false;
+        return date.equals(chessMove.date);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + game.hashCode();
         result = 31 * result + pgn.hashCode();
         result = 31 * result + date.hashCode();
         return result;
@@ -79,9 +83,9 @@ public class ChessMove {
     @Override
     public String toString() {
         return "ChessMove{" +
-                "id=" + id +
-                ", pgn='" + pgn + '\'' +
-                ", date=" + date +
-                '}';
+            "id=" + id +
+            ", pgn='" + pgn + '\'' +
+            ", date=" + date +
+            '}';
     }
 }
