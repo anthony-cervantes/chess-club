@@ -48,14 +48,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private TokenGenerator tokenGenerator;
 
-    private Boolean mandatoryValidation;
+    private boolean validationMandatory;
 
     @Autowired
     public AuthenticationServiceImpl(AccountRepository accountRepository, PlayerRepository playerRepository,
                                      SessionRepository sessionRepository, HashManager hashManager,
                                      GravatarHashManager gravatarHashManager, MailService mailService,
                                      TokenService tokenService, TokenGenerator tokenGenerator,
-                                     @Value("${chesscorp.account.validationRequired:false}") Boolean mandatoryValidation) {
+                                     @Value("${chesscorp.account.validationRequired:false}") boolean validationMandatory) {
         this.accountRepository = accountRepository;
         this.playerRepository = playerRepository;
         this.sessionRepository = sessionRepository;
@@ -64,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.mailService = mailService;
         this.tokenService = tokenService;
         this.tokenGenerator = tokenGenerator;
-        this.mandatoryValidation = mandatoryValidation;
+        this.validationMandatory = validationMandatory;
     }
 
     @PostConstruct
@@ -79,6 +79,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             account.setPassword(passwordHash);
             accountRepository.save(account);
         });
+    }
+
+    @Override
+    public boolean isValidationMandatory() {
+        return validationMandatory;
     }
 
     @Override
@@ -156,16 +161,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Account account = accountRepository.findOne(email);
 
         if (account == null) {
+            logger.debug("No account found for {}", email);
             throw new AuthenticationFailedException("No account for '" + email + "'");
         }
 
         String passwordHash = hashManager.hash(account.getSalt(), password);
 
         if (!account.getPassword().equals(passwordHash)) {
+            logger.debug("Invalid password for account {}", email);
             throw new AuthenticationFailedException("Invalid password");
         }
 
-        if (mandatoryValidation && !account.isValidated()) {
+        if (validationMandatory && !account.isValidated()) {
+            logger.debug("Account {} not validated", email);
             throw new AuthenticationFailedException("Account is not validated");
         }
 

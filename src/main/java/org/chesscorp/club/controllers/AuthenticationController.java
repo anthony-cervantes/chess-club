@@ -1,7 +1,6 @@
 package org.chesscorp.club.controllers;
 
 import org.chesscorp.club.dto.AuthenticationResult;
-import org.chesscorp.club.exception.AuthenticationFailedException;
 import org.chesscorp.club.model.people.Account;
 import org.chesscorp.club.model.people.Player;
 import org.chesscorp.club.model.people.Session;
@@ -37,7 +36,9 @@ public class AuthenticationController {
         logger.debug("Signing up user {}", email);
         authenticationService.signup(email, password, displayName);
 
-        try {
+        if (authenticationService.isValidationMandatory()) {
+            return null;
+        } else {
             String token = authenticationService.signin(email, password);
 
             Session session = authenticationService.getSession(token);
@@ -45,9 +46,6 @@ public class AuthenticationController {
             Player player = account.getPlayer();
 
             return new AuthenticationResult(token, account, player);
-        } catch (AuthenticationFailedException e) {
-            // If email validation is enforced, authentication is not enabled at this stage.
-            return null;
         }
     }
 

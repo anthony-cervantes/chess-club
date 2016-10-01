@@ -7,6 +7,7 @@ import org.chesscorp.club.model.token.Token;
  * Authentication related operations.
  */
 public interface AuthenticationService {
+    boolean isValidationMandatory();
 
     Token signup(String email, String password, String displayName);
 
