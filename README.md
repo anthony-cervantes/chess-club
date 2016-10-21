@@ -1,4 +1,4 @@
-#  [![Build Status][travis-image]][travis-url] [![Coverage Status](https://coveralls.io/repos/ChessCorp/chess-club/badge.svg?branch=master&service=github)](https://coveralls.io/github/ChessCorp/chess-club?branch=master)
+#  [![Build Status][travis-image]][travis-url] [![Coverage Status](https://coveralls.io/repos/ChessCorp/chess-club/badge.svg?branch=master&service=github)](https://coveralls.io/github/ChessCorp/chess-club?branch=master) [![Docker Pulls](https://img.shields.io/docker/pulls/chesscorp/chess-club.svg)](https://hub.docker.com/r/chesscorp/chess-club/)
 
 
 > Chess Server that will provide restful APIs and a complete Web UI.
