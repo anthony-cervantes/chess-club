@@ -6,13 +6,13 @@ import javax.persistence.*;
  * Chess position reference.
  */
 @Entity
-@Table(name = "robotcache", indexes = {
+@Table(name = "robot_cache", indexes = {
         @Index(columnList = "engine,parameters,position", unique = true)
 })
-@SequenceGenerator(name = "robotcache_seq", initialValue = 1, allocationSize = 1, sequenceName = "robotcache_seq")
+@SequenceGenerator(name = "robot_cache_seq", initialValue = 1, allocationSize = 1, sequenceName = "robot_cache_seq")
 public class RobotCacheEntry {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "robotcache_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "robot_cache_seq")
     private Long id;
 
     @Column(length = 16, nullable = false)

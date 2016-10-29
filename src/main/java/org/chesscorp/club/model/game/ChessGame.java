@@ -19,14 +19,14 @@ import java.util.List;
 @Proxy(lazy = false)
 @Table(
     indexes = {
-        @Index(columnList = "whiteplayer_id,blackplayer_id", unique = false)
+        @Index(columnList = "white_player_id,black_player_id", unique = false)
     }
 )
-@SequenceGenerator(name = "chessgame_seq", initialValue = 1, allocationSize = 1, sequenceName = "chessgame_seq")
+@SequenceGenerator(name = "chess_game_seq", initialValue = 1, allocationSize = 1, sequenceName = "chess_game_seq")
 public class ChessGame {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chessgame_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chess_game_seq")
     private Long id;
     @ManyToOne(optional = false)
     private Player whitePlayer;

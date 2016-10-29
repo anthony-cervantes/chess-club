@@ -11,11 +11,11 @@ import java.time.OffsetDateTime;
  * @author Yannick Kirschhoffer <alcibiade@alcibiade.org>
  */
 @Entity
-@SequenceGenerator(name = "elorating_seq", initialValue = 1, allocationSize = 1, sequenceName = "elorating_seq")
+@SequenceGenerator(name = "elo_rating_seq", initialValue = 1, allocationSize = 1, sequenceName = "elo_rating_seq")
 public class EloRating implements Comparable<EloRating> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "elorating_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "elo_rating_seq")
     private Long id;
 
     @Column(nullable = false)

@@ -13,11 +13,11 @@ import java.time.OffsetDateTime;
  */
 @Entity
 @Proxy(lazy = false)
-@SequenceGenerator(name = "chessmove_seq", initialValue = 1, allocationSize = 1, sequenceName = "chessmove_seq")
+@SequenceGenerator(name = "chess_move_seq", initialValue = 1, allocationSize = 1, sequenceName = "chess_move_seq")
 public class ChessMove {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chessmove_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chess_move_seq")
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)

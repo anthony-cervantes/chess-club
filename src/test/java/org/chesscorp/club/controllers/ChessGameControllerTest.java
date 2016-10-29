@@ -82,7 +82,7 @@ public class ChessGameControllerTest {
          */
 
         ChessGame game2 = chessGameController.getGame(game1.getId());
-        Assertions.assertThat(game2).isEqualToComparingFieldByField(game1);
+        Assertions.assertThat(game2).isEqualTo(game1);
 
         /*
          * Game moves
