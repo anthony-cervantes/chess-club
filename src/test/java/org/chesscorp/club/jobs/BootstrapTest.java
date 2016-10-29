@@ -2,7 +2,6 @@ package org.chesscorp.club.jobs;
 
 import org.assertj.core.api.Assertions;
 import org.chesscorp.club.Application;
-import org.chesscorp.club.model.people.ClubPlayer;
 import org.chesscorp.club.model.people.RobotPlayer;
 import org.chesscorp.club.persistence.AccountRepository;
 import org.chesscorp.club.persistence.ChessGameRepository;
@@ -54,11 +53,10 @@ public class BootstrapTest {
     @Test
     @Transactional
     public void testSampleData() {
-        Assertions.assertThat(playerRepository.findAll()).hasSize(19)
-                .hasAtLeastOneElementOfType(RobotPlayer.class)
-                .hasAtLeastOneElementOfType(ClubPlayer.class);
-        Assertions.assertThat(accountRepository.findAll()).hasSize(4);
+        Assertions.assertThat(playerRepository.findAll())
+            .hasAtLeastOneElementOfType(RobotPlayer.class);
+        Assertions.assertThat(accountRepository.findAll()).isEmpty();
         Assertions.assertThat(robotRepository.findAll()).hasSize(15);
-        Assertions.assertThat(chessGameRepository.findAll()).hasSize(2);
+        Assertions.assertThat(chessGameRepository.findAll()).isEmpty();
     }
 }
