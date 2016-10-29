@@ -25,7 +25,7 @@ public class Bootstrap {
 
     @PostConstruct
     public void init() {
-        bootstrapService.populate(true, true, true);
+        bootstrapService.populate(true, false, false);
         chessPositionService.updateMovePositions();
 //        bootstrapService.fixPgnNotationInGames();
     }
