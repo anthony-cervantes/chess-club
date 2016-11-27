@@ -2,6 +2,7 @@ package org.chesscorp.club.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -12,6 +13,7 @@ import java.util.Locale;
  * Thymeleaf implementation of template service operations.
  */
 @Component
+@Profile("mail")
 public class TemplateServiceImpl implements TemplateService {
     private SpringTemplateEngine templateEngine;
     private String baseUrl;
