@@ -14,6 +14,9 @@ RUN /usr/local/chesscorp/src/main/scripts/docker_build.sh
 
 EXPOSE 80
 VOLUME /data
+VOLUME /runtime
+
+WORKDIR /runtime
 
 ENV CLUB_BASEURL        http://chesscorp.org/
 ENV CLUB_DB_URL         jdbc:h2:file:/data/chess1
