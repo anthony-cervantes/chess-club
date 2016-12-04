@@ -108,7 +108,6 @@ public class SwaggerConfig {
 
     @Bean
     public UiConfiguration uiConfig() {
-        return new UiConfiguration(
-            "validatorUrl");
+        return new UiConfiguration(null);
     }
 }
