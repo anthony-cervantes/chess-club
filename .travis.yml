@@ -1,6 +1,9 @@
 language: java
 jdk:
   - oraclejdk8
+addons:
+  sonarqube:
+    token: $SONARQUBE_TOKEN
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y phalanx crafty
@@ -10,6 +13,9 @@ before_install:
   - tar xvfz gnuchess-6.2.2.tar.gz
   - pushd gnuchess-6.2.2 && ./configure && make && popd
   - sudo ln -sf $PWD/gnuchess-6.2.2/src/gnuchess /usr/bin/gnuchess
+scripts:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 after_success:
   - mkdir deploy
   - mv target/chess-club-${TRAVIS_TAG}.jar deploy/
