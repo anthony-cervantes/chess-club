@@ -55,7 +55,7 @@ public class ChessOpeningsServiceImpl implements ChessOpeningsService {
             String openingName = gameModel.getWhitePlayerName();
             String extension = gameModel.getBlackPlayerName();
 
-            if (!extension.equals("?")) {
+            if (!"?".equals(extension)) {
                 openingName += " - " + extension;
             }
 

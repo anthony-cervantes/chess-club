@@ -23,8 +23,7 @@ public class GnuChessAI implements ChessAI {
 
     @Override
     public String computeNextMove(String options, List<String> pgnMoves) throws PgnMoveException, IllegalMoveException {
-        int depth = Integer.valueOf(options);
-        String move = gnuChessEngine.computeNextMove(depth, 0, pgnMoves);
-        return move;
+        int depth = Integer.parseInt(options);
+        return gnuChessEngine.computeNextMove(depth, 0, pgnMoves);
     }
 }

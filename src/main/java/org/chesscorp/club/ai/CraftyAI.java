@@ -25,8 +25,7 @@ public class CraftyAI implements ChessAI {
 
     @Override
     public String computeNextMove(String options, List<String> pgnMoves) throws PgnMoveException, IllegalMoveException {
-        int depth = Integer.valueOf(options);
-        String move = craftyEngine.computeNextMove(depth, 0, pgnMoves);
-        return move;
+        int depth = Integer.parseInt(options);
+        return craftyEngine.computeNextMove(depth, 0, pgnMoves);
     }
 }

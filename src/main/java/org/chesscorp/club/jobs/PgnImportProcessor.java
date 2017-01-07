@@ -50,7 +50,7 @@ public class PgnImportProcessor {
 
     @ServiceActivator
     public File process(File file) {
-        logger.info("Importing games from " + file);
+        logger.info("Importing games from {}", file);
 
         try (InputStream pgnStream = new FileInputStream(file)) {
             performanceMonitor.mark();

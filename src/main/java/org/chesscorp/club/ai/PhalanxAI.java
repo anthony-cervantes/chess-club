@@ -23,8 +23,7 @@ public class PhalanxAI implements ChessAI {
 
     @Override
     public String computeNextMove(String options, List<String> pgnMoves) throws PgnMoveException, IllegalMoveException {
-        int depth = Integer.valueOf(options);
-        String move = phalanxEngine.computeNextMove(depth, 0, pgnMoves);
-        return move;
+        int depth = Integer.parseInt(options);
+        return phalanxEngine.computeNextMove(depth, 0, pgnMoves);
     }
 }
