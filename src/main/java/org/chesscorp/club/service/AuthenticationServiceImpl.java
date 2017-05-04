@@ -23,8 +23,6 @@ import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-
 /**
  * Authentication mechanisms based on account/player repositories.
  */
@@ -65,20 +63,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.tokenService = tokenService;
         this.tokenGenerator = tokenGenerator;
         this.validationMandatory = validationMandatory;
-    }
-
-    @PostConstruct
-    private void hashClearTextPasswords() {
-        accountRepository.readAllBySaltNull().forEach(account -> {
-            String salt = hashManager.createSalt();
-            String password = account.getPassword();
-
-            String passwordHash = hashManager.hash(salt, password);
-
-            account.setSalt(salt);
-            account.setPassword(passwordHash);
-            accountRepository.save(account);
-        });
     }
 
     @Override

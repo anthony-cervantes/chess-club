@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class ChessPositionServiceImpl implements ChessPositionService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional
     public long updateMovePositions() {
         logger.debug("Updating position tables");
 
@@ -163,11 +162,11 @@ public class ChessPositionServiceImpl implements ChessPositionService {
         ChessClubPosition position = moveToPosition.getChessPosition();
 
         List<ChessGame> relatedGames = chessMoveToPositionRepository
-                .findFirst10ByChessClubPositionId(position.getId()).stream()
-                .map(mtp -> chessMoveRepository.getOne(mtp.getChessMoveId()))
-                .filter(move -> !move.getGame().getId().equals(game.getId()))
-                .map(ChessMove::getGame)
-                .collect(Collectors.toList());
+            .findFirst10ByChessClubPositionId(position.getId()).stream()
+            .map(mtp -> chessMoveRepository.getOne(mtp.getChessMoveId()))
+            .filter(move -> !move.getGame().getId().equals(game.getId()))
+            .map(ChessMove::getGame)
+            .collect(Collectors.toList());
 
         return relatedGames;
     }
@@ -194,31 +193,31 @@ public class ChessPositionServiceImpl implements ChessPositionService {
         }
 
         List<ChessAnalysisMove> movesAnalysis = IntStream.range(0, game.getMoves().size())
-                .mapToObj(moveIndex -> {
-                    ChessMove move = game.getMoves().get(moveIndex);
-                    ChessMoveToPosition moveToPosition = chessMoveToPositionRepository.findOne(move.getId());
+            .mapToObj(moveIndex -> {
+                ChessMove move = game.getMoves().get(moveIndex);
+                ChessMoveToPosition moveToPosition = chessMoveToPositionRepository.findOne(move.getId());
 
-                    if (moveToPosition == null) {
-                        return null;
-                    }
+                if (moveToPosition == null) {
+                    return null;
+                }
 
-                    ChessClubPosition chessPosition = moveToPosition.getChessPosition();
+                ChessClubPosition chessPosition = moveToPosition.getChessPosition();
 
-                    if (chessPosition == null || chessPosition.getScore() == null) {
-                        return null;
-                    }
+                if (chessPosition == null || chessPosition.getScore() == null) {
+                    return null;
+                }
 
-                    ChessAnalysisMove moveAnalysis = new ChessAnalysisMove(
-                            move.getId(),
-                            moveIndex,
-                            chessPosition.getScore(),
-                            chessPosition.getExpected()
-                    );
+                ChessAnalysisMove moveAnalysis = new ChessAnalysisMove(
+                    move.getId(),
+                    moveIndex,
+                    chessPosition.getScore(),
+                    chessPosition.getExpected()
+                );
 
-                    return moveAnalysis;
-                })
-                .filter(ma -> (ma != null))
-                .collect(Collectors.toList());
+                return moveAnalysis;
+            })
+            .filter(ma -> (ma != null))
+            .collect(Collectors.toList());
 
         return new ChessAnalysis(game.getId(), movesAnalysis);
     }
