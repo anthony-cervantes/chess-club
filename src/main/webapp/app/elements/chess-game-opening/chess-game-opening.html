@@ -1,0 +1,67 @@
+<dom-module id="chess-game-opening">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .wrapper {
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxGetOpenings"
+            url="/api/chess/openings/openings"
+            method="GET"
+            on-response="_handleGetOpenings"
+        ></iron-ajax>
+
+        <div class="wrapper">
+            <template is="dom-repeat" items="{{_openings}}" as="opening">
+                <div>Current opening:<br/>{{opening.name}}</div>
+                <div>
+                    Possible variants:
+                    <template is="dom-repeat" items="{{opening.variants}}" as="variant">
+                        <span>{{variant}}</span>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'chess-game-opening',
+
+                properties: {
+                    moves: {
+                        type: Array,
+                        observer: '_movesUpdated'
+                    },
+
+                    _openings: {
+                        type: Object
+                    }
+                },
+
+                _movesUpdated: function (moves) {
+                    if (moves && moves.length) {
+                        this.$.ajaxGetOpenings.params = {moves: moves};
+                        this.$.ajaxGetOpenings.generateRequest();
+                    } else {
+                        this._openings = [];
+                    }
+                },
+
+                _handleGetOpenings: function (evt) {
+                    this._openings = evt.detail.response;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

@@ -1,0 +1,142 @@
+<dom-module id="chess-game-resign">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .wrapper {
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxResign"
+            url="/api/chess/game/{{gameData.id}}/resign"
+            method="POST"
+            on-response="_handlePostResign"
+        ></iron-ajax>
+
+
+        <div class="wrapper">
+            <template is="dom-if" if="{{_canDelete}}">
+                <div class="delete">
+                    Since the first round is not complete yet, you can safely <a href="#" on-click="_clickDelete">delete
+                    this game</a>.
+                    Ratings won't be affected.
+                </div>
+            </template>
+            <template is="dom-if" if="{{_canResign}}">
+                <template is="dom-if" if="{{!_step}}">
+                    <div class="resign">
+                        <a href="#" on-click="_clickResign">Resign</a>
+                    </div>
+                </template>
+                <template is="dom-if" if="{{_step}}">
+                    <div class="resign">
+                        <a href="#" on-click="_clickConfirm" on-mouseout="_leave">Really ?</a>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'chess-game-resign',
+
+                properties: {
+                    gameData: {
+                        type: Object,
+                        observer: '_gameUpdated',
+                        notify: true
+                    },
+
+                    authenticationData: {
+                        type: Object,
+                        observer: '_gameUpdated'
+                    },
+
+                    _canDelete: {
+                        type: Boolean
+                    },
+
+                    _canResign: {
+                        type: Boolean
+                    },
+
+                    _step: {
+                        type: Number,
+                        default: 0
+                    }
+                },
+
+                _gameUpdated: function () {
+                    var game = this.gameData;
+
+                    if (!game || !this.authenticationData) {
+                        return;
+                    }
+
+                    console.debug('Game resignation update for', game);
+                    this._step = 0;
+
+                    if (game.status === 'OPEN' && this.authenticationData.player &&
+                        (this.authenticationData.player.id === game.whitePlayer.id ||
+                        this.authenticationData.player.id === game.blackPlayer.id)
+                    ) {
+                        if (game.moves.length < 2) {
+                            this._canDelete = true;
+                            this._canResign = false;
+                        } else {
+                            this._canDelete = false;
+                            this._canResign = true;
+                        }
+                    } else {
+                        this._canDelete = false;
+                        this._canResign = false;
+                    }
+                },
+
+                _clickDelete: function () {
+                    console.debug('Deleting game', this.gameData.id);
+                    this.$.ajaxResign.generateRequest();
+                    event.preventDefault();
+                    return false;
+                },
+
+                _clickResign: function () {
+                    console.debug('Resigning game', this.gameData.id);
+                    this._step = 1;
+                    event.preventDefault();
+                    return false;
+                },
+
+                _clickConfirm: function () {
+                    console.debug('Confirming resignation for game', this.gameData.id);
+                    this.$.ajaxResign.generateRequest();
+                    this._canDelete = false;
+                    this._canResign = false;
+                    this._step = 0;
+                    event.preventDefault();
+                    return false;
+                },
+
+                _leave: function () {
+                    this._step = 0;
+                },
+
+                _handlePostResign: function (event) {
+                    var updatedGame = event.detail.response;
+                    console.debug('Resignation returned data', updatedGame);
+                    this.gameData = updatedGame;
+                }
+
+            });
+        })();
+    </script>
+
+</dom-module>

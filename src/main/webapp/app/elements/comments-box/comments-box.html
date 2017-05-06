@@ -1,0 +1,166 @@
+<dom-module id="comments-box">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .comment {
+            margin-top: 8px;
+            margin-down: 8px;
+        }
+
+        form {
+            margin-top: 32px;
+        }
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxReadComments"
+            url="/api/comment/game/"
+            method="GET"
+            on-response="_handleComments"
+        ></iron-ajax>
+
+        <iron-ajax
+            id="ajaxPostComment"
+            url="/api/comment/game/"
+            method="POST"
+            on-response="_handlePostResponse"
+            on-error="_handlePostError"
+        ></iron-ajax>
+
+        <template is="dom-repeat" items="{{_comments}}" as="comment">
+            <div class="row comment">
+                <div class="col-md-4">
+                    <div class="author"><a href="/player/{{comment.author.id}}">{{comment.author.displayName}}</a></div>
+                    <div class="date">{{comment.dateText}}</div>
+                </div>
+                <div class="col-md-8">
+                    <mark-down text="{{comment.text}}"></mark-down>
+                </div>
+            </div>
+        </template>
+
+        <template is="dom-if" if="{{authenticationData.token}}">
+            <form class="form-horizontal" on-submit="_formSubmit">
+                <fieldset>
+
+                    <!-- Form Name -->
+                    <legend>Comment this game</legend>
+
+                    <!-- Textarea -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="commentArea">Your Message</label>
+                        <div class="col-md-8">
+                            <textarea class="form-control" id="commentArea" name="commentArea"
+                                      placeholder="Enter your comment here (markdown is supported)"
+                                      on-keydown="_keyDown"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="singlebutton"></label>
+                        <div class="col-md-4">
+                            <button id="singleButton" name="singlebutton" class="btn btn-primary">Post</button>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
+
+        </template>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'comments-box',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        }
+                    },
+
+                    gameId: {
+                        type: Number,
+                        observer: '_onGameChange'
+                    },
+
+                    _comments: {
+                        type: Array,
+                        value: function () {
+                            return [];
+                        }
+                    }
+
+                },
+
+                _handleComments: function (event) {
+                    var comments = event.detail.response;
+                    console.log('Fetched comments:', comments);
+
+                    for (var i = 0; i < comments.length; i++) {
+                        var d = new Date(1000 * comments[i].date);
+                        comments[i].dateText = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+                    }
+
+                    this._comments = comments;
+                },
+
+                _keyDown: function (evt) {
+                    if (evt && evt.code === 'Enter' && evt.ctrlKey) {
+                        this._formSubmit();
+                    }
+                },
+
+                _formSubmit: function (evt) {
+                    console.log(this, this.$, evt);
+                    this.$$('#commentArea').disabled = true;
+                    this.$$('#singleButton').disabled = true;
+
+                    var textArea = this.$$('#commentArea');
+                    var commentText = textArea.value;
+                    console.log('Posting comment:', commentText);
+                    this.$.ajaxPostComment.params = {text: commentText};
+                    this.$.ajaxPostComment.generateRequest();
+
+                    if (evt) {
+                        evt.preventDefault();
+                    }
+
+                    return false;
+                },
+
+                _handlePostResponse: function (event) {
+                    this.$$('#commentArea').disabled = undefined;
+                    this.$$('#singleButton').disabled = undefined;
+
+                    var textArea = this.$$('#commentArea');
+                    textArea.value = '';
+                    this._handleComments(event);
+                },
+
+                _handlePostError: function () {
+                    this.$$('#commentArea').disabled = undefined;
+                    this.$$('#singleButton').disabled = undefined;
+                },
+
+                _onGameChange: function (gameId) {
+                    console.log('Reading comments for game', gameId);
+                    this.$.ajaxReadComments.url = '/api/comment/game/' + gameId;
+                    this.$.ajaxPostComment.url = '/api/comment/game/' + gameId;
+
+                    this.$.ajaxReadComments.generateRequest();
+                }
+
+            });
+        })();
+    </script>
+
+</dom-module>

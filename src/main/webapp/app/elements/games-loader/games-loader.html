@@ -1,0 +1,92 @@
+<dom-module id="games-loader">
+    <style>
+        :host {
+            display: block;
+        }
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxGameSearch"
+            url="/api/chess/game/search"
+            method="POST"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <iron-ajax
+            id="ajaxGetCredentials"
+            auto="true"
+            url="/api/authentication/getCredentials"
+            method="GET"
+            body="{}"
+            content-type="application/json"
+            on-response="_handleCredentialsResponse"
+            on-error="_handleCredentialsError"
+        ></iron-ajax>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'games-loader',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        observer: '_onAuthentication',
+                        notify: true
+                    },
+
+                    openGames: {
+                        type: Array,
+                        notify: true
+                    }
+                },
+
+                refresh: function () {
+                    if (this.authenticationData.token) {
+                        console.log('Fetching games');
+                        this.$.ajaxGameSearch.params = {playerId: this.authenticationData.player.id, open: true};
+                        this.$.ajaxGameSearch.generateRequest();
+                    } else {
+                        this.openGames = [];
+                    }
+                },
+
+                _onAuthentication: function () {
+                    this.refresh();
+                },
+
+                _handleResponse: function (event) {
+                    var games = event.detail.response;
+
+                    games.forEach(function (g) {
+                        g.url = '/game/' + g.id;
+                    });
+
+                    console.log('Games loaded', games);
+                    this.openGames = games;
+                },
+
+                _handleCredentialsResponse: function (event) {
+                    var credentials = event.detail.response;
+                    console.debug('Session credentials:', credentials);
+                    this.fire('authentication', credentials);
+                },
+
+                _handleCredentialsError: function () {
+                    console.debug('No active credentials');
+                    this.authenticationData = {
+                        serverError: true
+                    };
+
+                    this._intervalID = window.setTimeout(function (component) {
+                        console.debug('Trying to get remote credentials again');
+                        component.$.ajaxGetCredentials.generateRequest();
+                    }, 10000, this);
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

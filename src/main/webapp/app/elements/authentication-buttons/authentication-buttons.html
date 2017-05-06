@@ -1,0 +1,47 @@
+<dom-module id="authentication-buttons">
+    <style>
+        :host {
+            display: block;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{authenticationData.token}}">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" on-click="_signOutClick">Sign Out</a></li>
+            </ul>
+        </template>
+
+        <iron-ajax
+            id="ajaxSignOut"
+            url="/api/authentication/signout"
+            method="POST"
+            body="{}"
+            content-type="application/json"
+            on-response="_handleSignOutResponse"
+        ></iron-ajax>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'authentication-buttons',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object
+                    }
+                },
+
+                _signOutClick: function () {
+                    this.$.ajaxSignOut.generateRequest();
+                },
+
+                _handleSignOutResponse: function () {
+                    this.fire('signout', {});
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

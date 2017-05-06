@@ -1,0 +1,122 @@
+<dom-module id="chess-game-navigation">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .wrapper {
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+        .wrapper span {
+            margin-left: 4px;
+            margin-right: 4px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+    </style>
+    <template>
+        <div class="wrapper">
+            <a href="#" on-click="_clickFirst"><span class="glyphicon glyphicon-fast-backward"
+                                                     aria-hidden="true"></span></a>
+            <a href="#" on-click="_clickPrev"><span class="glyphicon glyphicon-backward" aria-hidden="true"></span></a>
+            <span>{{_currentIndex}}</span>
+            <a href="#" on-click="_clickNext"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span></a>
+            <a href="#" on-click="_clickLast"><span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span></a>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'chess-game-navigation',
+
+                properties: {
+                    moves: {
+                        type: Array
+                    },
+
+                    moveIndex: {
+                        type: Number,
+                        observer: '_moveIndexUpdated',
+                        notify: true
+                    },
+
+                    _currentIndex: {
+                        type: String
+                    }
+                },
+
+                _updateRoundIndex: function (moveIndex) {
+                    if (moveIndex === 0) {
+                        this._currentIndex = 'W01';
+                        return;
+                    }
+
+                    var ix = '';
+
+                    // Actual index is the chess round index, not the raw moves array index.
+                    var actualIndex = 1 + Math.floor((moveIndex - 1) / 2);
+
+                    if (moveIndex % 2 === 0) {
+                        ix += 'B';
+                    } else {
+                        ix += 'W';
+                    }
+
+                    if (actualIndex < 10) {
+                        ix += '0';
+                    }
+
+                    ix += actualIndex;
+
+                    this._currentIndex = ix;
+                },
+
+                _moveIndexUpdated: function (moveIndex) {
+                    this._updateRoundIndex(moveIndex);
+                },
+
+                _clickFirst: function () {
+                    this.moveIndex = 1;
+
+                    event.preventDefault();
+                    return false;
+                },
+                _clickPrev: function () {
+                    if (this.moveIndex > 1) {
+                        this.moveIndex -= 1;
+                    }
+
+                    event.preventDefault();
+                    return false;
+                },
+                _clickNext: function () {
+                    if (this.moveIndex < this.moves.length) {
+                        this.moveIndex += 1;
+                    }
+
+                    event.preventDefault();
+                    return false;
+                },
+                _clickLast: function () {
+                    this.moveIndex = this.moves.length;
+
+                    event.preventDefault();
+                    return false;
+                }
+
+            });
+        })();
+    </script>
+
+</dom-module>

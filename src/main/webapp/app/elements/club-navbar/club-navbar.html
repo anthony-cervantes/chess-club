@@ -1,0 +1,58 @@
+<dom-module id="club-navbar">
+
+    <style>
+        :host {
+            display: block;
+        }
+
+        #filler {
+            padding-top: 42px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #filler {
+                padding-top: 84px;
+            }
+        }
+
+    </style>
+
+    <template>
+
+        <nav class="navbar navbar-default navbar-fixed-top navbar-frontfix-chess" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Chess Corp</a>
+                </div>
+
+                <template is="dom-if" if="{{authenticationData.token}}">
+                    <ul class="nav navbar-nav visible-sm-block visible-md-block visible-lg-block">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/player/{{authenticationData.player.id}}">Your Profile</a></li>
+                        <li><a href="/settings">Settings</a></li>
+                    </ul>
+                </template>
+
+                <authentication-buttons authentication-data="{{authenticationData}}"></authentication-buttons>
+            </div>
+        </nav>
+
+        <div id="filler"></div>
+
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'club-navbar',
+
+                properties: {
+                    authenticationData: {
+                        type: Object
+                    }
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

@@ -1,0 +1,88 @@
+<dom-module id="club-footer">
+
+    <style>
+        :host {
+            display: block;
+        }
+
+        .wrapper {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 24px 24px 90px 24px;
+            text-shadow: 1px 1px 3px #000000;
+
+            height: 360px;
+            margin-top: -360px;
+        }
+
+        .partner {
+            display: inline;
+            margin: 24px;
+        }
+
+        .partner img {
+            height: 100px;
+        }
+
+        .wrapper, .wrapper a {
+            color: #9ab;
+            text-decoration: none;
+        }
+
+        h3 {
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+
+    </style>
+
+    <template>
+        <div class="wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <release-info></release-info>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="/contact">Contact Information</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>Our Partners</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="partner">
+                                    <a href="https://www.jetbrains.com/"><img
+                                        src="../../images/footer/logo_JetBrains_1.svg"/></a>
+                                </div>
+                                <div class="partner">
+                                    <a href="https://github.com/ChessCorp/"><img src="../../images/footer/Octocat.png"/></a>
+                                </div>
+                                <div class="partner">
+                                    <a href="https://travis-ci.com/"><img
+                                        src="../../images/footer/TravisCI-Mascot-1.png"/></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'club-footer',
+                properties: {}
+            });
+        })();
+    </script>
+
+</dom-module>

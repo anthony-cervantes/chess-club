@@ -1,0 +1,100 @@
+<dom-module id="game-create">
+    <style>
+        :host {
+            display: block;
+        }
+
+        paper-dialog {
+            background: white;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxCreateGame"
+            url="/api/chess/game"
+            method="POST"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <form class="form-horizontal" on-submit="_onSubmit">
+            <fieldset>
+
+                <legend>Start a Game</legend>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="side">Your Side</label>
+                    <div class="col-md-4">
+                        <select id="side" name="side" class="form-control">
+                            <option value="w">White</option>
+                            <option value="b">Black</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="validate"></label>
+                    <div class="col-md-4">
+                        <button id="validate" name="validate" class="btn btn-primary">Start Game</button>
+                    </div>
+                </div>
+
+            </fieldset>
+        </form>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'game-create',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        },
+                        notify: true
+                    },
+
+                    opponentId: {
+                        type: String
+                    }
+                },
+
+                _onSubmit: function (event) {
+                    console.debug('Form submitted:', event);
+                    event.preventDefault();
+                    this.$.side.disabled = true;
+                    this.$.validate.disabled = true;
+
+                    var whitePlayerId = this.authenticationData.player.id;
+                    var blackPlayerId = this.opponentId;
+
+                    if (this.$.side.value === 'b') {
+                        whitePlayerId = this.opponentId;
+                        blackPlayerId = this.authenticationData.player.id;
+                    }
+
+                    this.$.ajaxCreateGame.params = {whitePlayerId: whitePlayerId, blackPlayerId: blackPlayerId};
+                    this.$.ajaxCreateGame.generateRequest();
+                    return false;
+                },
+
+                _handleResponse: function (event) {
+                    var game = event.detail.response;
+                    console.log('Created game', game);
+                    this.$.side.disabled = undefined;
+                    this.$.validate.disabled = undefined;
+
+                    this.fire('game-created', {id: game.id});
+                    page('/game/' + game.id);
+                }
+
+
+            });
+        })();
+    </script>
+
+</dom-module>

@@ -1,0 +1,85 @@
+<dom-module id="account-validation">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        div {
+            display: none;
+        }
+
+        p {
+            padding-top: 24px;
+            font-size: larger;
+        }
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxValidate"
+            url="/api/authentication/validate"
+            method="POST"
+            on-response="_handleResponse"
+            on-error="_handleFailure"
+        ></iron-ajax>
+
+        <div id="success">
+            <p>Your account has been successfully validated. You can now sign in.</p>
+        </div>
+
+        <div id="failure">
+            <p>Validation failed.</p>
+        </div>
+
+        <div id="pending">
+            <p>Please wait while your account is being validated.</p>
+        </div>
+
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'account-validation',
+
+                properties: {
+
+                    token: {
+                        type: String,
+                        observer: '_tokenUpdated'
+                    }
+                },
+
+                _tokenUpdated: function (newTokenValue) {
+                    console.debug('Token received: ', newTokenValue);
+                    this.$.ajaxValidate.params = {
+                        tokenText: newTokenValue
+                    };
+                    this.$.ajaxValidate.generateRequest();
+                    this.$.success.classList.toggle('visible', false);
+                    this.$.failure.classList.toggle('visible', false);
+                    this.$.pending.classList.toggle('visible', true);
+                },
+
+                _handleResponse: function (event) {
+                    var response = event.detail.response;
+                    console.debug('Account validation response received', response);
+                    this.$.success.classList.toggle('visible', true);
+                    this.$.failure.classList.toggle('visible', false);
+                    this.$.pending.classList.toggle('visible', false);
+                },
+
+                _handleFailure: function () {
+                    console.debug('Account validation failed.');
+                    this.$.success.classList.toggle('visible', false);
+                    this.$.failure.classList.toggle('visible', true);
+                    this.$.pending.classList.toggle('visible', false);
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

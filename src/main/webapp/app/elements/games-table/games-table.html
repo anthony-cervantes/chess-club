@@ -1,0 +1,158 @@
+<dom-module id="games-table">
+    <style>
+        :host {
+            display: block;
+        }
+
+        tr.game-row:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        thead tr {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        tbody td {
+            padding: 4px;
+        }
+
+        span.badge {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxGameSearch"
+            url="/api/chess/game/search"
+            method="POST"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>White</th>
+                <th>Black</th>
+                <th>Moves</th>
+                <th>Last Move</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <template is="dom-repeat" items="{{games}}" as="game">
+                <tr class="game-row">
+                    <td><a href$="/player/{{game.whitePlayer.id}}">{{game.whitePlayer.displayName}}</a></td>
+                    <td><a href$="/player/{{game.blackPlayer.id}}">{{game.blackPlayer.displayName}}</a></td>
+                    <td>{{game.movesCount}}</td>
+                    <td>{{game.lastMove}}</td>
+                    <template is="dom-if" if="{{game.yourTurn}}">
+                        <td><span class="badge">Your Turn</span></td>
+                    </template>
+                    <template is="dom-if" if="{{!game.yourTurn}}">
+                        <td></td>
+                    </template>
+                    <td><a href$="/game/{{game.id}}">Open</a></td>
+                </tr>
+            </template>
+            </tbody>
+        </table>
+
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'games-table',
+
+                properties: {
+
+                    playerId: {
+                        type: Number,
+                        observer: '_playerChange'
+                    },
+
+                    games: {
+                        type: Array,
+                        observer: '_gamesChange',
+                        value: function () {
+                            return [];
+                        }
+                    },
+
+                    authenticationData: {
+                        type: Object,
+                        observer: '_authChange',
+                        value: function () {
+                            return {};
+                        }
+                    }
+                },
+
+                _displayTime: function (sec) {
+                    var time;
+
+                    if (sec < 60) {
+                        time = Math.floor(sec) + 's';
+                    } else if (sec < 3600) {
+                        var m = Math.floor(sec / 60);
+                        var s = Math.floor(sec - 60 * m);
+                        time = '' + m + 'min ' + s + 's';
+                    } else if (sec < 48 * 3600) {
+                        var h = Math.floor(sec / 3600);
+                        time = '' + h + ' hours';
+                    } else {
+                        var d = Math.floor(sec / (24 * 3600));
+                        time = '' + d + ' days';
+                    }
+
+                    return time;
+                },
+
+                _gamesChange: function (games) {
+                    console.debug('Games changed for table', games);
+
+                    var self = this;
+
+                    games.forEach(function (game) {
+                        if (game.moves.length === 0) {
+                            game.lastMove = '';
+                        } else {
+                            var lastMoveTs = game.moves[game.moves.length - 1].date * 1000;
+                            var now = new Date().getTime();
+                            var durationMs = now - lastMoveTs;
+                            var durationString = self._displayTime(durationMs / 1000);
+                            game.lastMove = '' + durationString + ' ago';
+                        }
+
+                        if (self.authenticationData && self.authenticationData.player &&
+                                 game.nextPlayer.id === self.authenticationData.player.id) {
+                            game.yourTurn = true;
+                        }
+
+                        game.movesCount = 1 + Math.floor((game.moves.length - 1) / 2);
+                    });
+                },
+
+                _authChange: function () {
+                    this._gamesChange(this.games);
+                },
+
+                _playerChange: function (playerId) {
+                    this.$.ajaxGameSearch.params = {playerId: playerId, open: true};
+                    this.$.ajaxGameSearch.generateRequest();
+                },
+
+                _handleResponse: function (event) {
+                    console.debug('Displaying games', event);
+                    var games = event.detail.response;
+
+                    console.debug('Games loaded', games);
+                    this.games = games;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

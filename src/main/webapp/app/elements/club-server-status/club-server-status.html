@@ -1,0 +1,30 @@
+<dom-module id="club-server-status">
+    <style>
+        :host {
+            display: block;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{authenticationData.serverError}}">
+            <div class="alert alert-warning" role="alert">
+                Server is currently unreachable.
+            </div>
+        </template>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'club-server-status',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object
+                    }
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

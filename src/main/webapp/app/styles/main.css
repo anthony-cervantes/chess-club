@@ -1,0 +1,35 @@
+/* Override some board styles to adapt to the page style */
+.coord.chess-board {
+    background-color: #4e5d6c;
+    color: #ebebeb;
+}
+
+table.chess-board {
+    border-width: 0;
+}
+
+.cell.black.chess-board {
+    background: #5e6d7c;
+}
+
+.cell.white.chess-board {
+    background: #ddeeff;
+}
+
+html, body {
+    height: 100%;
+}
+
+body > #club-container {
+    height: auto;
+    min-height: 100%;
+}
+
+/**
+ * Hack to work around issue in bootstrap minified css that has a low z-index and thus
+ * has pieces going over the navbars when scrolling.
+ */
+
+.navbar-fixed-top.navbar-frontfix-chess {
+    z-index: 1000;
+}

@@ -1,0 +1,54 @@
+<dom-module id="home-games">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .wrapper {
+            margin-top: 42px;
+            margin-bottom: 42px;
+        }
+
+    </style>
+    <template>
+        <div class="wrapper">
+            <template is="dom-if" if="{{openGames.length}}">
+                <h2>Your current games</h2>
+                <games-table authentication-data="{{authenticationData}}" games="{{openGames}}"></games-table>
+            </template>
+
+            <template is="dom-if" if="{{!openGames.length}}">
+                <h2>Welcome to Chess Corp</h2>
+
+                <p>Use the selectors below to open potential adversaries and start a game with them.</p>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'home-games',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        },
+                    },
+
+                    openGames: {
+                        type: Array
+                    }
+                },
+
+                ready: function () {
+
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

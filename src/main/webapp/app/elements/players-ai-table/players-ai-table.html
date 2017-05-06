@@ -1,0 +1,67 @@
+<dom-module id="players-ai-table">
+    <style>
+        :host {
+            display: block;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxPlayersSearch"
+            url="/api/player/search-ai"
+            method="GET"
+            auto="true"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <h2>Available engines:</h2>
+        <div class="row">
+            <template is="dom-repeat" items="{{_engines}}" as="engine">
+                <div class="col-md-4">
+                    <template is="dom-repeat" items="{{engine}}" as="player">
+                        <a href$="/player/{{player.id}}">
+                            <div class="flex">
+                                <span>{{player.displayName}}</span>
+                            </div>
+                        </a>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'players-ai-table',
+
+                properties: {},
+
+                _handleResponse: function (event) {
+                    var players = event.detail.response;
+                    console.debug('Displaying AI players', players);
+                    var engines = {};
+
+                    players.forEach(
+                        function (player) {
+                            var cat = player.displayName.substr(0, 3);
+
+                            if (!engines[cat]) {
+                                engines[cat] = [];
+                            }
+
+                            engines[cat].push(player);
+                        }
+                    );
+
+                    this._engines = Object.keys(engines).map(function (k) {
+                        return engines[k];
+                    });
+                }
+
+            });
+        })();
+    </script>
+
+</dom-module>

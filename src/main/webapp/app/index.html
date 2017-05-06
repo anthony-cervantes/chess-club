@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="A social chess playing site.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChessCorp Chess Club</title>
+    <!-- Place favicon.ico in the `app/` directory -->
+
+    <!-- Chrome for Android theme color -->
+    <meta name="theme-color" content="#303F9F">
+
+    <!-- Web Application Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Tile color for Win8 -->
+    <meta name="msapplication-TileColor" content="#3372DF">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="PSK">
+    <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="ChessCorp Chess Club">
+    <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
+
+    <!-- Tile icon for Win8 (144x144) -->
+    <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+
+    <!-- build:css styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild-->
+
+    <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <!-- endbuild -->
+
+    <!-- will be replaced with elements/elements.vulcanized.html -->
+    <link rel="import" href="elements/elements.html">
+    <!-- endreplace-->
+
+    <!--build:css bower_components/bootswatch/superhero/bootstrap.min.css -->
+    <link rel="stylesheet" href="bower_components/bootswatch/superhero/bootstrap.css">
+    <!-- endbuild-->
+
+</head>
+
+<body>
+<span id="browser-sync-binding"></span>
+<template is="dom-bind" id="app">
+    <div id="club-container" class="container" role="main">
+
+        <club-navbar authentication-data="{{authenticationData}}"></club-navbar>
+
+        <club-server-status authentication-data="{{authenticationData}}"></club-server-status>
+
+        <signature-items authentication-data="{{authenticationData}}"></signature-items>
+
+        <div class="row">
+            <iron-pages attr-for-selected="data-route" selected="{{route}}">
+
+                <section data-route="home">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <home-games authentication-data="{{authenticationData}}"
+                                            open-games="{{openGames}}"></home-games>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <search-player></search-player>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <players-ai-table></players-ai-table>
+                            </div>
+                            <div class="col-md-4">
+                                <players-opponents-table
+                                    player-id="{{authenticationData.player.id}}"></players-opponents-table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section data-route="player">
+                    <player-profile authentication-data="{{authenticationData}}"
+                                    player-id="{{playerId}}"></player-profile>
+                </section>
+
+                <section data-route="chess-game">
+                    <chess-game authentication-data="{{authenticationData}}"
+                                game-id="{{chessGameId}}"></chess-game>
+                </section>
+
+                <section data-route="chess-create">
+                    <game-create authentication-data="{{authenticationData}}"
+                                 opponent-id="{{opponentPlayerId}}"></game-create>
+                </section>
+
+                <section data-route="contact">
+                    <h2 class="paper-font-display2">Contact</h2>
+                    <p>This is the contact section</p>
+                </section>
+
+                <section data-route="accountValidation">
+                    <account-validation token="{{validationToken}}"/>
+                </section>
+
+            </iron-pages>
+        </div>
+
+        <!-- Placeholder for footer in fluid layout -->
+        <div style="margin-top: 42px; height: 360px;"></div>
+    </div>
+
+    <games-loader id="games-loader" authentication-data="{{authenticationData}}"
+                  open-games="{{openGames}}"></games-loader>
+
+    <club-footer></club-footer>
+</template>
+
+<!-- build:js scripts/app.js -->
+<script src="scripts/app.js"></script>
+<!-- endbuild-->
+</body>
+
+</html>

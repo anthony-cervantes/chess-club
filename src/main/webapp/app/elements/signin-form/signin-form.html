@@ -1,0 +1,99 @@
+<dom-module id="signin-form">
+    <style>
+        :host {
+            display: block;
+        }
+
+        #failureMessage {
+            color: brown;
+            display: none;
+        }
+
+        #failureMessage.visible {
+            display: block;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxSignIn"
+            url="/api/authentication/signin"
+            method="POST"
+            on-response="_handleSignUpResponse"
+            on-error="_handleFailure"
+        ></iron-ajax>
+
+        <div>
+            <form class="form-horizontal" on-submit="_formSubmit">
+                <legend>Already member ?</legend>
+
+                <label for="inputEmail" class="sr-only">Email address</label>
+                <input type="text" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Remember me
+                    </label>
+                </div>
+
+                <p id="failureMessage">Authentication failed</p>
+
+                <button id="signinButton" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            </form>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'signin-form',
+
+                properties: {
+
+                    /**
+                     * The `authentication` event is fired when authentication succeeds.
+                     *
+                     * @event authentication
+                     * @detail {{token: String}}
+                     */
+
+                },
+
+                _formSubmit: function (evt) {
+                    console.debug('Signing in', this.$.inputEmail.value);
+                    this.$.inputEmail.disabled = true;
+                    this.$.inputPassword.disabled = true;
+                    this.$.signinButton.disabled = true;
+
+                    this.$.ajaxSignIn.params = {
+                        email: this.$.inputEmail.value,
+                        password: this.$.inputPassword.value
+                    };
+                    this.$.ajaxSignIn.generateRequest();
+                    evt.preventDefault();
+                    return false;
+                },
+
+                _handleSignUpResponse: function (event) {
+                    var response = event.detail.response;
+                    console.debug('Authentication succeeded', response);
+                    this.fire('authentication', response);
+                    this.$.failureMessage.classList.toggle('visible', false);
+
+                    this.$.inputEmail.disabled = undefined;
+                    this.$.inputPassword.disabled = undefined;
+                    this.$.signinButton.disabled = undefined;
+                },
+
+                _handleFailure: function () {
+                    this.$.failureMessage.classList.toggle('visible', true);
+                    this.$.inputEmail.disabled = undefined;
+                    this.$.inputPassword.disabled = undefined;
+                    this.$.signinButton.disabled = undefined;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

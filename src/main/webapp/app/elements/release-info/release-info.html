@@ -1,0 +1,36 @@
+<dom-module id="release-info">
+    <style>
+        :host {
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxApiVersion"
+            url="/api/status/release"
+            method="GET"
+            on-response="_handleResponse"
+            auto="true"
+        ></iron-ajax>
+
+        <span>{{release.name}}</span>
+        <br/>
+        <span>Revision {{release.revision}}</span>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'release-info',
+
+                properties: {},
+
+                _handleResponse: function (event) {
+                    console.debug('Server release informations:', event.detail.response);
+                    this.release = event.detail.response;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

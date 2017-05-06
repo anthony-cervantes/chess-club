@@ -1,0 +1,247 @@
+<dom-module id="chess-game">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .game-data {
+            text-align: center;
+            font-size: larger;
+            padding: 12px 0 12px 0;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxGameGet"
+            url="/api/chess/game"
+            method="GET"
+            on-response="_handleGameGet"
+        ></iron-ajax>
+
+        <iron-ajax
+            id="ajaxPostMove"
+            url="/api/chess/game"
+            method="POST"
+            on-response="_handlePostMove"
+        ></iron-ajax>
+
+        <div class="wrapper">
+
+            <div class="row">
+                <div class="col-lg-6 col-lg-offset-2 col-md-8">
+                    <chess-board id="board"
+                                 piece-size="{{pieceSize}}"
+                                 moves="{{_moves}}"
+                                 move-index="{{_moveIndex}}"
+                                 interactive-sides="{{_interactiveSides}}"
+                                 on-piece-move="_onPieceMove"
+                                 pov="{{_pov}}"
+                    ></chess-board>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <div class="game-data">
+                        <a href="/player/{{_gameData.whitePlayer.id}}">{{_gameData.whitePlayer.displayName}}</a>
+                        <br/>vs.<br/>
+                        <a href="/player/{{_gameData.blackPlayer.id}}">{{_gameData.blackPlayer.displayName}}</a>
+                    </div>
+
+                    <chess-game-status
+                        game-data="{{_gameData}}"
+                        authentication-data="{{authenticationData}}"
+                    ></chess-game-status>
+
+                    <chess-game-opening
+                        moves="{{_moves}}"
+                    ></chess-game-opening>
+
+                    <chess-game-resign
+                        game-data="{{_gameData}}"
+                        authentication-data="{{authenticationData}}"
+                    ></chess-game-resign>
+
+                    <chess-game-navigation
+                        moves="{{_moves}}"
+                        move-index="{{_moveIndex}}"
+                    ></chess-game-navigation>
+
+                    <chess-history
+                        moves="{{_moves}}"
+                        move-index="{{_moveIndex}}"
+                    ></chess-history>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <chess-game-analysis game-data="{{_gameData}}" move-index="{{_moveIndex}}"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <comments-box game-id="{{gameId}}" authentication-data="{{authenticationData}}"></comments-box>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'chess-game',
+
+                properties: {
+
+                    gameId: {
+                        type: Number,
+                        observer: '_loadGame',
+                    },
+
+                    pieceSize: {
+                        type: String,
+                        value: '64px'
+                    },
+
+                    authenticationData: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        },
+                        notify: true
+                    },
+
+                    _moves: {
+                        type: Array
+                    },
+
+                    _moveIndex: {
+                        type: Number
+                    },
+
+                    _gameData: {
+                        type: Object,
+                        observer: '_gameUpdated'
+                    },
+
+                    _interactiveSides: {
+                        type: Array
+                    },
+
+                    _pov: {
+                        type: String,
+                        default: 'W'
+                    },
+
+                    _intervalID: {
+                        type: Object
+                    }
+                },
+
+                next: function () {
+                    this._moveIndex = Math.min(this._moveIndex + 1, this._moves.length);
+                },
+
+                previous: function () {
+                    this._moveIndex = Math.max(this._moveIndex - 1, 0);
+                },
+
+                _loadGame: function (gameId) {
+                    this.$.ajaxGameGet.url = '/api/chess/game/' + gameId;
+                    this.$.ajaxGameGet.generateRequest();
+                },
+
+                _handleGameGet: function (event) {
+                    var game = event.detail.response;
+                    this._updateMoves(game);
+                    console.debug('Fetched game', game, 'for user', this.authenticationData);
+                },
+
+                _gameUpdated: function (game) {
+                    var pov = 'W';
+                    var interactiveSides = [];
+
+                    if (this.authenticationData.player && game.status === 'OPEN') {
+                        if (game.whitePlayer.id == this.authenticationData.player.id) {
+                            interactiveSides.push('W');
+                        }
+
+                        if (game.blackPlayer.id == this.authenticationData.player.id) {
+                            interactiveSides.push('B');
+                            pov = 'B';
+                        }
+                    }
+
+                    this._pov = pov;
+                    this._interactiveSides = interactiveSides;
+                },
+
+                _onPieceMove: function (event) {
+                    var pgnMove = event.detail.pgn;
+                    console.debug('Moving', pgnMove);
+                    var moves = this._moves.slice(0);
+                    moves.push(pgnMove);
+                    this._moves = moves;
+
+                    this.$.ajaxPostMove.url = '/api/chess/game/' + this.gameId;
+                    this.$.ajaxPostMove.params = {move: pgnMove};
+                    this.$.ajaxPostMove.generateRequest();
+                },
+
+                _handlePostMove: function (reply) {
+                    console.debug('Game update result', reply);
+                    var game = reply.detail.response;
+                    this._updateMoves(game);
+                },
+
+                _updateMoves: function (game) {
+                    console.debug('Updating moves from game data', game.moves);
+
+                    if (this._gameData && this._gameData.id == game.id && this._gameData.moves.length == game.moves.length) {
+                        console.debug('Don\'t update the game model as it has not changed on the origin');
+                    } else {
+                        var updatedMoves = [];
+
+                        for (var i = 0; i < game.moves.length; i++) {
+                            updatedMoves[i] = game.moves[i].pgn;
+                        }
+
+                        this._gameData = game;
+                        this._moves = updatedMoves;
+                    }
+
+                    // If it's not our turn, start polling for updates.
+                    if (game.status === 'OPEN' && (!this.authenticationData.player || game.nextPlayer.id !== this.authenticationData.player.id)) {
+                        this._startPolling();
+                    } else {
+                        this._stopPolling();
+                    }
+                },
+
+                _startPolling: function () {
+                    console.debug('Scheduling polling for game', this._gameData.id);
+
+                    this._stopPolling();
+                    var baseDate = this._gameData.moves.length === 0 ?
+                        this._gameData.startDate :
+                        this._gameData.moves[this._gameData.moves.length - 1].date;
+
+                    var delay = Math.min(10000, (Date.now() - baseDate * 1000) / 2);
+
+                    console.debug('Idling for ' + delay + 'ms');
+
+                    this._intervalID = window.setTimeout(function (component) {
+                        console.debug('Polling status of game', component._gameData.id);
+                        component._loadGame(component._gameData.id);
+                    }, delay, this);
+                },
+
+                _stopPolling: function () {
+                    if (this._intervalID) {
+                        window.clearInterval(this._intervalID);
+                        this._intervalID = undefined;
+                    }
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

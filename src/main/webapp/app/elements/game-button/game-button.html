@@ -1,0 +1,60 @@
+<dom-module id="game-button">
+    <style>
+        :host {
+            display: block;
+        }
+
+        paper-dialog {
+            background: white;
+        }
+
+    </style>
+    <template>
+        <template is="dom-if" if="{{_visible}}">
+            <a href$="/create/{{opponentId}}">Start a game</a>
+        </template>
+
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'game-button',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        observer: '_evaluateVisibility',
+                        value: function () {
+                            return {};
+                        },
+                        notify: true
+                    },
+
+                    opponentId: {
+                        type: String,
+                        observer: '_evaluateVisibility',
+                    },
+
+                    _visible: {
+                        type: Boolean
+                    }
+
+                    /**
+                     * The `game-created` event is fired whenever a new game is created.
+                     *
+                     * @event game-created
+                     * @detail {{id: Number}}
+                     */
+                },
+
+                _evaluateVisibility: function () {
+                    this._visible = this.authenticationData.token && this.opponentId != this.authenticationData.player.id;
+                }
+
+            });
+        })();
+    </script>
+
+</dom-module>

@@ -1,0 +1,128 @@
+<dom-module id="signup-form">
+    <style>
+        :host {
+            display: block;
+        }
+
+        #failureMessage {
+            color: brown;
+            display: none;
+        }
+
+        #failureMessage.visible {
+            display: block;
+        }
+
+        #successMessage {
+            color: darkgreen;
+            display: none;
+        }
+
+        #successMessage.visible {
+            display: block;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxSignUp"
+            url="/api/authentication/signup"
+            method="POST"
+            on-response="_handleResponse"
+            on-error="_handleFailure"
+        ></iron-ajax>
+
+        <form class="form-horizontal" on-submit="_formSubmit">
+            <legend>Create account</legend>
+
+            <p id="failureMessage">Subscription failed</p>
+            <p id="successMessage">A validation link has been sent to your address. Please check your emails.</p>
+
+            <label for="inputName" class="sr-only">Display name</label>
+            <input type="text" id="inputName" class="form-control" placeholder="Display name" required autofocus>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+            <button id="signupButton" class="btn btn-lg btn-primary btn-block" type="submit">Create account
+            </button>
+        </form>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'signup-form',
+
+                properties: {
+
+                    /**
+                     * The `authentication` event is fired whenever a piece is moved from an interactive side.
+                     *
+                     * @event authentication
+                     * @detail {{token: String}}
+                     */
+
+                },
+
+                _reset: function () {
+                    this.$.successMessage.classList.toggle('visible', false);
+                    this.$.failureMessage.classList.toggle('visible', false);
+                    this.$.inputName.value = '';
+                    this.$.inputEmail.value = '';
+                    this.$.inputPassword.value = '';
+
+                    this.$.inputName.disabled = undefined;
+                    this.$.inputEmail.disabled = undefined;
+                    this.$.inputPassword.disabled = undefined;
+                    this.$.signupButton.disabled = undefined;
+
+                },
+
+                _formSubmit: function (evt) {
+                    console.debug('Signing up', this.$.inputEmail.value);
+                    this.$.ajaxSignUp.params = {
+                        email: this.$.inputEmail.value,
+                        password: this.$.inputPassword.value,
+                        displayName: this.$.inputName.value
+                    };
+
+                    this.$.inputName.disabled = true;
+                    this.$.inputEmail.disabled = true;
+                    this.$.inputPassword.disabled = true;
+                    this.$.signupButton.disabled = true;
+
+                    this.$.ajaxSignUp.generateRequest();
+                    evt.preventDefault();
+                    return false;
+                },
+
+                _handleResponse: function (event) {
+                    var response = event.detail.response;
+
+                    // If email validation is mandatory, the response will be empty. If not, the response
+                    // will be a valid session structure.
+                    if (response && response.token) {
+                        this.fire('authentication', response);
+                    }
+
+                    this._reset();
+                    console.debug('Authentication success, displaying message.');
+                    this.$.successMessage.classList.toggle('visible', true);
+                    this.$.failureMessage.classList.toggle('visible', false);
+                },
+
+                _handleFailure: function () {
+                    console.debug('Authentication failed.');
+                    this.$.successMessage.classList.toggle('visible', false);
+                    this.$.failureMessage.classList.toggle('visible', true);
+                    this.$.inputName.disabled = undefined;
+                    this.$.inputEmail.disabled = undefined;
+                    this.$.inputPassword.disabled = undefined;
+                    this.$.signupButton.disabled = undefined;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

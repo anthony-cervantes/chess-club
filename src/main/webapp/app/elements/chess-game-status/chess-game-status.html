@@ -1,0 +1,91 @@
+<dom-module id="chess-game-status">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .wrapper {
+            text-align: center;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+    </style>
+    <template>
+        <div class="wrapper">
+            <span>{{_statusText}}</span><br/>
+            <paper-spinner id="spinner"></paper-spinner>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'chess-game-status',
+
+                properties: {
+                    gameData: {
+                        type: Object,
+                        observer: '_gameUpdated'
+                    },
+
+                    authenticationData: {
+                        type: Object,
+                        observer: '_authUpdated'
+                    },
+
+                    _statusText: {
+                        type: String
+                    }
+                },
+
+                _authUpdated: function () {
+                    this._refreshStatus();
+                },
+
+                _gameUpdated: function (game, pGame) {
+                    if (pGame && pGame.status === 'OPEN' && game.status !== pGame.status) {
+                        this.fire('game-ended', {id: game.id});
+                    }
+
+                    this._refreshStatus();
+                },
+
+                _refreshStatus: function () {
+                    var game = this.gameData;
+
+                    if (!game || !this.authenticationData) {
+                        return;
+                    }
+
+                    if (game.status === 'OPEN' && game.nextPlayer.engine) {
+                        this.$$('#spinner').active = true;
+                    } else {
+                        this.$$('#spinner').active = false;
+                    }
+
+                    console.debug('Game status update for', game);
+
+                    if (game.status === 'OPEN') {
+                        if (this.authenticationData.player && this.authenticationData.player.id === game.nextPlayer.id) {
+                            this._statusText = 'It\'s your turn';
+                        } else {
+                            this._statusText = 'It is ' + game.nextPlayer.displayName + '\'s turn';
+                        }
+                    } else {
+                        if (game.moves.length < 2) {
+                            this._statusText = 'Game has been deleted';
+                        } else if (game.status === 'WHITEWON') {
+                            this._statusText = 'Game is over: ' + game.whitePlayer.displayName + ' won !';
+                        } else if (game.status === 'BLACKWON') {
+                            this._statusText = 'Game is over: ' + game.blackPlayer.displayName + ' won !';
+                        } else if (game.status === 'PAT') {
+                            this._statusText = 'Game is over: PAT !';
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

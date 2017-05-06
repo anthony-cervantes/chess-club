@@ -1,0 +1,105 @@
+<dom-module id="search-player">
+    <style>
+        :host {
+            display: block;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        #wrapper {
+            position: relative;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        #results {
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+        }
+
+        #results {
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxPlayerSearch"
+            url="/api/player/search"
+            method="POST"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <form>
+            <legend>Search a player</legend>
+
+            <input id="inSearch" type="text" name="query" label="Search player"
+                   autocomplete="off"
+                   on-keyup="_keypressHandler"
+                   on-focus="_onFocus"
+                   on-blur="_onBlur"
+            />
+
+            <div id="wrapper">
+                <div id="results">
+                    <div class="list-group">
+                        <template is="dom-repeat" items="{{results}}">
+                            <a class="list-group-item" href$="{{item.url}}">{{item.displayName}}</a>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'search-player',
+
+                properties: {
+
+                    results: {
+                        type: Array,
+                        value: function () {
+                            return [];
+                        }
+                    }
+                },
+
+                _onFocus: function () {
+                    this.$.wrapper.style.opacity = 1;
+                },
+
+                _onBlur: function () {
+                    var wrapper = this.$.wrapper;
+                    window.setTimeout(function () {
+                        wrapper.style.opacity = 0;
+                    }, 500);
+                },
+
+                _keypressHandler: function () {
+                    var query = this.$.inSearch.value;
+                    if (query !== '') {
+                        this.$.ajaxPlayerSearch.params = {query: query};
+                        this.$.ajaxPlayerSearch.generateRequest();
+                    }
+                },
+
+                _handleResponse: function (event) {
+                    var players = event.detail.response;
+                    players.forEach(function (p) {
+                        p.url = '/player/' + p.id;
+                    });
+
+                    this.results = players;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

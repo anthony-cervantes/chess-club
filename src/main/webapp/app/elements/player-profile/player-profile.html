@@ -1,0 +1,188 @@
+<dom-module id="player-profile">
+    <style>
+        :host {
+            display: block;
+        }
+
+        thead tr {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        tbody td {
+            padding: 4px;
+        }
+
+        tr.pvp:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .num {
+            text-align: right;
+        }
+
+        #chart {
+            width: 100%;
+        }
+
+        .portrait {
+            float: right;
+            margin: 0 0 32px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxPlayerProfile"
+            method="GET"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <div>
+            <template is="dom-if" if="{{profileData.player.avatarHash}}">
+                <div class="portrait">
+                    <img src="http://www.gravatar.com/avatar/{{profileData.player.avatarHash}}?s=92"/>
+                </div>
+            </template>
+
+            <h2>{{profileData.player.displayName}}</h2>
+
+            <p>Player ID: <span>{{playerId}}</span></p>
+
+            <game-button authentication-data="{{authenticationData}}" opponent-id="{{playerId}}"></game-button>
+
+            <h3>Elo rating history</h3>
+
+            <google-chart id="chart"
+                          type="line"
+                          data="{{_eloHistoryData}}"
+                          options="{{_chartOptions}}"
+            >
+            </google-chart>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <h3>Current games</h3>
+                    <games-table authentication-data="{{authenticationData}}" player-id="{{playerId}}"></games-table>
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Game history</h3>
+
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Opponent</th>
+                            <th class="num">Wins</th>
+                            <th class="num">Draws</th>
+                            <th class="num">Losses</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template is="dom-repeat" items="{{profileData.pvpStatistics}}" as="statistic">
+                            <tr class="pvp">
+                                <td><a href$="/player/{{statistic.opponent.id}}">{{statistic.opponent.displayName}}</a>
+                                </td>
+                                <td class="num">{{statistic.pvpStatus.wins}}</td>
+                                <td class="num">{{statistic.pvpStatus.draws}}</td>
+                                <td class="num">{{statistic.pvpStatus.losses}}</td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'player-profile',
+
+                properties: {
+
+                    playerId: {
+                        type: Number,
+                        observer: '_onSetPlayerId',
+                    },
+
+                    profileData: {
+                        type: Object
+                    },
+
+                    authenticationData: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        }
+                    },
+
+                    _chartOptions: {
+                        type: Object,
+                        value: function () {
+                            return {
+                                legend: 'none',
+                                backgroundColor: '#4E5D6C',
+                                pointSize: 10,
+                                curveType: 'function',
+                                series: {
+                                    0: {color: '#E72'}
+                                },
+                                hAxis: {
+                                    textStyle: {color: '#FFF'},
+                                    gridlines: {color: '#888'},
+                                    baselineColor: '#FFF'
+                                },
+                                vAxis: {
+                                    textStyle: {color: '#FFF'},
+                                    gridlines: {color: '#888'},
+                                    baselineColor: '#FFF'
+                                }
+                            };
+                        }
+                    }
+                },
+
+                _onSetPlayerId: function (playerId) {
+                    this.$.ajaxPlayerProfile.url = '/api/player/profile/' + playerId;
+                    this.$.ajaxPlayerProfile.generateRequest();
+                },
+
+                _handleResponse: function (event) {
+                    console.debug('Received player profile data', event.detail.response);
+                    this.profileData = event.detail.response;
+
+                    var historyData = [[
+                        'Date',
+                        'ELO',
+                        {type: 'string', role: 'annotation'},
+                        {type: 'string', role: 'style'}
+                    ]];
+
+                    historyData.push([new Date(this.profileData.player.registrationDate * 1000), 1200, null, 'point { size: 0; }']);
+                    var currentScore = 1200;
+                    var profilePlayerId = this.playerId;
+
+                    this.profileData.eloHistory.forEach(function (item) {
+                        var opponent =
+                            (item.chessGame.whitePlayer.id == profilePlayerId) ?
+                                item.chessGame.blackPlayer.displayName :
+                                item.chessGame.whitePlayer.displayName;
+
+                        var row = [new Date(item.scoreDate * 1000), item.eloRating, opponent, null];
+                        currentScore = item.eloRating;
+                        historyData.push(row);
+                    });
+
+                    historyData.push([new Date(), currentScore, null, 'point { size: 0; }']);
+
+                    console.debug('History data set', historyData);
+                    this._eloHistoryData = historyData;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

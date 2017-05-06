@@ -1,0 +1,49 @@
+<dom-module id="signature-items">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .row {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 12px;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{_anonymous}}">
+            <div class="row">
+                <div class="col-md-4">
+
+                </div>
+                <div class="col-md-4">
+                    <signup-form></signup-form>
+                </div>
+                <div class="col-md-4">
+                    <signin-form></signin-form>
+                </div>
+            </div>
+        </template>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'signature-items',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        observer: '_onAuthenticationChange'
+                    }
+                },
+
+                _onAuthenticationChange: function (authenticationData) {
+                    this._anonymous = authenticationData.token === null;
+                }
+
+            });
+        })();
+    </script>
+
+</dom-module>

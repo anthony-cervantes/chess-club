@@ -1,0 +1,87 @@
+<dom-module id="game-box-menu">
+    <style>
+        :host {
+            display: block;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .wrapper {
+            padding: 5px;
+            margin: 7px;
+        }
+
+        .wrapper.idle {
+            border: 1px dotted #666677;
+            background-color: #EEF;
+        }
+
+        .wrapper.available {
+            border: 1px solid #666677;
+            background-color: #CDC;
+        }
+
+        .wrapper div {
+            padding: 4px;
+        }
+
+        .wrapper div.white {
+            background: #EEF;
+        }
+
+        .wrapper div.black {
+            background-color: #BBC;
+        }
+    </style>
+    <template>
+        <div class$="wrapper {{_class}}">
+            <a href="/game/{{game.id}}">
+                <div class="white">{{game.whitePlayer.displayName}}</div>
+                <div class="black">{{game.blackPlayer.displayName}}</div>
+                <div class="status">{{game.status}}</div>
+            </a>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'game-box-menu',
+
+                properties: {
+
+                    authenticationData: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        }
+                    },
+
+                    game: {
+                        type: Object,
+                        observer: '_gameUpdated'
+                    },
+
+                    _class: {
+                        type: String
+                    }
+                },
+
+                _gameUpdated: function (game) {
+                    if (this.authenticationData.player.id === game.nextPlayer.id) {
+                        this._class = 'available';
+                    } else {
+                        this._class = 'idle';
+                    }
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

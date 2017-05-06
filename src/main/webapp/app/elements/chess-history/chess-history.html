@@ -1,0 +1,189 @@
+<dom-module id="chess-history">
+    <style>
+        :host {
+            display: block;
+        }
+
+        table a:hover {
+            text-decoration: underline;
+        }
+
+        table a {
+            text-decoration: none;
+        }
+
+        table thead tr {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .history-wrapper {
+
+        }
+
+        thead, tbody, tr, td, th {
+            display: block;
+        }
+
+        tr:after {
+            content: ' ';
+            display: block;
+            visibility: hidden;
+            clear: both;
+        }
+
+        tbody {
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        thead {
+            /* fallback */
+        }
+
+        tbody td, thead th {
+            float: left;
+            text-align: center;
+        }
+
+        table tbody td:nth-child(1) {
+            width: 20%;
+            text-align: right;
+        }
+
+        table thead th:nth-child(1) {
+            width: 10%;
+        }
+
+        td, th {
+            width: 40%;
+        }
+
+        table tbody tr td.notcurrent {
+            border: 1px solid transparent;
+        }
+
+        table tbody tr td.current {
+            border: 1px solid #ddeeff;
+        }
+
+    </style>
+    <template>
+
+        <div class="history-wrapper">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>White</th>
+                    <th>Black</th>
+                </tr>
+                </thead>
+                <tbody>
+                <template is="dom-repeat" items="{{_pairs}}">
+                    <tr>
+                        <td>{{item.index}}</td>
+                        <td class$="{{item.whiteClass}}"><a href="#" on-click="_moveClickW">{{item.white}}</a></td>
+                        <td class$="{{item.blackClass}}"><a href="#" on-click="_moveClickB">{{item.black}}</a></td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'chess-history',
+
+                properties: {
+                    moves: {
+                        type: Array,
+                        observer: '_movesUpdated'
+                    },
+
+                    moveIndex: {
+                        type: Number,
+                        observer: '_moveIndexUpdated',
+                        notify: true
+                    },
+
+                    _pairs: {
+                        type: Array,
+                        notify: true
+                    }
+                },
+
+                _movesUpdated: function () {
+                    this._refreshPairs();
+                },
+
+                _refreshPairs: function () {
+                    if (this.moves && this.moveIndex >= 0) {
+                        var pairs = [];
+                        var pair = {};
+
+                        for (var i = 0; i < this.moves.length; i++) {
+                            if (i % 2 === 0) {
+                                pair = {
+                                    offset: i,
+                                    index: '' + (1 + i / 2) + '.',
+                                    white: this.moves[i],
+                                    black: null,
+                                    whiteClass: 'notcurrent',
+                                    blackClass: 'notcurrent'
+                                };
+                            } else {
+                                pair.black = this.moves[i];
+                                pairs.push(pair);
+                            }
+                        }
+
+                        if (this.moves.length % 2 == 1) {
+                            pairs.push(pair);
+                        }
+
+                        var pairIndex = Math.floor((this.moveIndex - 1) / 2);
+                        console.debug('Pair index is', pairIndex);
+
+                        if (this.moveIndex > 0 && pairIndex < pairs.length) {
+                            if (this.moveIndex % 2 === 0) {
+                                pairs[pairIndex].blackClass = 'current';
+                            } else {
+                                pairs[pairIndex].whiteClass = 'current';
+                            }
+                        }
+
+                        this._pairs = pairs;
+                    }
+                },
+
+                _moveClickW: function (event) {
+                    this.moveIndex = event.model.item.offset + 1;
+                    event.preventDefault();
+                    return false;
+                },
+
+                _moveClickB: function (event) {
+                    this.moveIndex = event.model.item.offset + 2;
+                    event.preventDefault();
+                    return false;
+                },
+
+                _moveIndexUpdated: function () {
+                    this._refreshPairs();
+                    var self = this;
+                    window.setTimeout(function () {
+                        var rownumber = Math.ceil(1 + self.moveIndex / 2) - 1;
+                        var row = self.$$('tbody > tr:nth-child(' + rownumber + ')');
+                        console.debug('Scroll to row', rownumber, row);
+                        if (row && row.scrollIntoViewIfNeeded) {
+                            row.scrollIntoViewIfNeeded();
+                        }
+                    }, 500);
+                }
+            });
+        })();
+    </script>
+
+</dom-module>

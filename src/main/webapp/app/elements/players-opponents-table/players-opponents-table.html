@@ -1,0 +1,60 @@
+<dom-module id="players-opponents-table">
+    <style>
+        :host {
+            display: block;
+        }
+
+    </style>
+    <template>
+        <iron-ajax
+            id="ajaxPlayersSearch"
+            url="/api/player/search-opponents"
+            method="GET"
+            on-response="_handleResponse"
+        ></iron-ajax>
+
+        <h2>Suggested opponents:</h2>
+
+        <template is="dom-repeat" items="{{_players}}">
+            <paper-icon-item>
+                <a href$="/player/{{item.id}}">
+                    <div class="flex">
+                        <span>{{item.displayName}}</span>
+                    </div>
+                </a>
+            </paper-icon-item>
+        </template>
+
+    </template>
+
+    <script>
+        (function () {
+            Polymer({
+                is: 'players-opponents-table',
+
+                properties: {
+                    playerId: {
+                        type: Number,
+                        observer: '_playerChange'
+                    }
+                },
+
+                _playerChange: function (playerId) {
+                    if (playerId) {
+                        this.$.ajaxPlayersSearch.params = {playerId: playerId};
+                        this.$.ajaxPlayersSearch.generateRequest();
+                    } else {
+                        this._players = [];
+                    }
+                },
+
+                _handleResponse: function (event) {
+                    var players = event.detail.response;
+                    console.log('Displaying AI players', players);
+                    this._players = players;
+                }
+            });
+        })();
+    </script>
+
+</dom-module>
