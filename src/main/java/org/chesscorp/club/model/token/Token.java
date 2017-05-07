@@ -1,5 +1,8 @@
 package org.chesscorp.club.model.token;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 
@@ -9,7 +12,15 @@ import java.time.OffsetDateTime;
  * @author Yannick Kirschhoffer <alcibiade@alcibiade.org>
  */
 @Entity
-@SequenceGenerator(name = "token_seq", initialValue = 1, allocationSize = 1, sequenceName = "token_seq")
+@GenericGenerator(
+    name = "token_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "token_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "token_seq")

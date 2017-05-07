@@ -2,6 +2,8 @@ package org.chesscorp.club.model.comment;
 
 import org.chesscorp.club.model.game.ChessGame;
 import org.chesscorp.club.model.people.Player;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
@@ -10,7 +12,15 @@ import java.time.OffsetDateTime;
  * Comment related to a chess game.
  */
 @Entity
-@SequenceGenerator(name = "chess_comment_seq", initialValue = 1, allocationSize = 1, sequenceName = "chess_comment_seq")
+@GenericGenerator(
+    name = "chess_comment_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "chess_comment_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public class ChessComment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chess_comment_seq")
@@ -61,10 +71,10 @@ public class ChessComment {
     @Override
     public String toString() {
         return "ChessComment{" +
-                "id=" + id +
-                ", author=" + author +
-                ", date=" + date +
-                ", chessGame=" + chessGame +
-                '}';
+            "id=" + id +
+            ", author=" + author +
+            ", date=" + date +
+            ", chessGame=" + chessGame +
+            '}';
     }
 }

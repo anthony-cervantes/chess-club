@@ -1,5 +1,8 @@
 package org.chesscorp.club.model.robot;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 import javax.persistence.*;
 
 /**
@@ -7,9 +10,17 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "robot_cache", indexes = {
-        @Index(columnList = "engine,parameters,position", unique = true)
+    @Index(columnList = "engine,parameters,position", unique = true)
 })
-@SequenceGenerator(name = "robot_cache_seq", initialValue = 1, allocationSize = 1, sequenceName = "robot_cache_seq")
+@GenericGenerator(
+    name = "robot_cache_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "robot_cache_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public class RobotCacheEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "robot_cache_seq")
@@ -60,11 +71,11 @@ public class RobotCacheEntry {
     @Override
     public String toString() {
         return "RobotCacheEntry{" +
-                "id=" + id +
-                ", engine='" + engine + '\'' +
-                ", parameters='" + parameters + '\'' +
-                ", position='" + position + '\'' +
-                ", pgnMoveText='" + pgnMoveText + '\'' +
-                '}';
+            "id=" + id +
+            ", engine='" + engine + '\'' +
+            ", parameters='" + parameters + '\'' +
+            ", position='" + position + '\'' +
+            ", pgnMoveText='" + pgnMoveText + '\'' +
+            '}';
     }
 }

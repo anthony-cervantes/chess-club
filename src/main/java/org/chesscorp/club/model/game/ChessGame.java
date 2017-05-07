@@ -2,6 +2,8 @@ package org.chesscorp.club.model.game;
 
 import org.alcibiade.chess.model.ChessGameStatus;
 import org.chesscorp.club.model.people.Player;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
@@ -22,7 +24,15 @@ import java.util.List;
         @Index(columnList = "white_player_id,black_player_id", unique = false)
     }
 )
-@SequenceGenerator(name = "chess_game_seq", initialValue = 1, allocationSize = 1, sequenceName = "chess_game_seq")
+@GenericGenerator(
+    name = "chess_game_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "chess_game_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public class ChessGame {
 
     @Id
@@ -146,10 +156,10 @@ public class ChessGame {
 
         ChessGame chessGame = (ChessGame) o;
 
-        if (id != null ? !id.equals(chessGame.id) : chessGame.id != null) return false;
-        if (!whitePlayer.equals(chessGame.whitePlayer)) return false;
-        if (!blackPlayer.equals(chessGame.blackPlayer)) return false;
-        return startDate.equals(chessGame.startDate);
+        return (id != null ? id.equals(chessGame.id) : chessGame.id == null)
+            && whitePlayer.equals(chessGame.whitePlayer)
+            && blackPlayer.equals(chessGame.blackPlayer)
+            && startDate.equals(chessGame.startDate);
 
     }
 

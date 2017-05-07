@@ -1,5 +1,8 @@
 package org.chesscorp.club.model.stats;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
 import javax.persistence.*;
 
 /**
@@ -7,7 +10,15 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "chess_position")
-@SequenceGenerator(name = "chess_position_seq", initialValue = 1, allocationSize = 1, sequenceName = "chess_position_seq")
+@GenericGenerator(
+    name = "chess_position_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "chess_position_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public class ChessClubPosition {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chess_position_seq")
@@ -56,10 +67,10 @@ public class ChessClubPosition {
     @Override
     public String toString() {
         return "ChessClubPosition{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
-                ", score=" + score +
-                ", expected='" + expected + '\'' +
-                '}';
+            "id=" + id +
+            ", text='" + text + '\'' +
+            ", score=" + score +
+            ", expected='" + expected + '\'' +
+            '}';
     }
 }

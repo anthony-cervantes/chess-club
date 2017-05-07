@@ -1,6 +1,8 @@
 package org.chesscorp.club.model.game;
 
 import org.chesscorp.club.model.people.Player;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
@@ -11,7 +13,15 @@ import java.time.OffsetDateTime;
  * @author Yannick Kirschhoffer <alcibiade@alcibiade.org>
  */
 @Entity
-@SequenceGenerator(name = "elo_rating_seq", initialValue = 1, allocationSize = 1, sequenceName = "elo_rating_seq")
+@GenericGenerator(
+    name = "elo_rating_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "elo_rating_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public class EloRating implements Comparable<EloRating> {
 
     @Id
@@ -63,11 +73,11 @@ public class EloRating implements Comparable<EloRating> {
     @Override
     public String toString() {
         return "EloRating{" +
-                "id=" + id +
-                ", player=" + player +
-                ", chessGame=" + chessGame +
-                ", eloRating=" + eloRating +
-                '}';
+            "id=" + id +
+            ", player=" + player +
+            ", chessGame=" + chessGame +
+            ", eloRating=" + eloRating +
+            '}';
     }
 
     @Override

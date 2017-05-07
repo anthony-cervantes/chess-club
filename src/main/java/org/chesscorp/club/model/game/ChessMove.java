@@ -1,6 +1,7 @@
 package org.chesscorp.club.model.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
@@ -13,7 +14,15 @@ import java.time.OffsetDateTime;
  */
 @Entity
 @Proxy(lazy = false)
-@SequenceGenerator(name = "chess_move_seq", initialValue = 1, allocationSize = 1, sequenceName = "chess_move_seq")
+@GenericGenerator(
+    name = "chess_move_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @org.hibernate.annotations.Parameter(name = "sequence_name", value = "chess_move_seq"),
+        @org.hibernate.annotations.Parameter(name = "initial_value", value = "1"),
+        @org.hibernate.annotations.Parameter(name = "increment_size", value = "1")
+    }
+)
 public class ChessMove {
 
     @Id
@@ -65,10 +74,10 @@ public class ChessMove {
 
         ChessMove chessMove = (ChessMove) o;
 
-        if (id != null ? !id.equals(chessMove.id) : chessMove.id != null) return false;
-        if (!game.equals(chessMove.game)) return false;
-        if (!pgn.equals(chessMove.pgn)) return false;
-        return date.equals(chessMove.date);
+        return (id != null ? id.equals(chessMove.id) : chessMove.id == null)
+            && game.equals(chessMove.game)
+            && pgn.equals(chessMove.pgn)
+            && date.equals(chessMove.date);
     }
 
     @Override

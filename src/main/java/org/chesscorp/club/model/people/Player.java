@@ -1,5 +1,7 @@
 package org.chesscorp.club.model.people;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
@@ -13,12 +15,20 @@ import java.util.Objects;
 @Entity
 @Proxy(lazy = false)
 @Table(
-        indexes = {
-                @Index(columnList = "displayName", unique = false),
-                @Index(columnList = "normalizedName", unique = false)
-        }
+    indexes = {
+        @Index(columnList = "displayName", unique = false),
+        @Index(columnList = "normalizedName", unique = false)
+    }
 )
-@SequenceGenerator(name = "player_seq", initialValue = 1, allocationSize = 1, sequenceName = "player_seq")
+@GenericGenerator(
+    name = "player_seq",
+    strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+    parameters = {
+        @Parameter(name = "sequence_name", value = "player_seq"),
+        @Parameter(name = "initial_value", value = "1"),
+        @Parameter(name = "increment_size", value = "1")
+    }
+)
 public abstract class Player implements Comparable<Player> {
 
     @Id
@@ -69,8 +79,8 @@ public abstract class Player implements Comparable<Player> {
     @Override
     public String toString() {
         return "Player{" +
-                "id=" + id +
-                ", displayName='" + displayName + '\'' +
-                '}';
+            "id=" + id +
+            ", displayName='" + displayName + '\'' +
+            '}';
     }
 }
