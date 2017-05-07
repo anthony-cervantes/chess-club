@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y nmon htop openjdk-8-jdk maven phalanx gnuchess
+RUN apt-get update && apt-get install -y nmon htop openjdk-8-jdk phalanx gnuchess
 RUN update-ca-certificates -f
 RUN ln -s /usr/games/gnuchess /usr/bin/gnuchess
 RUN ln -s /usr/games/phalanx /usr/bin/phalanx
@@ -8,7 +8,7 @@ RUN ln -s /usr/games/phalanx /usr/bin/phalanx
 # Crafty is not included in the default linux distrib, so we comment it out for now
 #RUN ln -s /usr/games/crafty /usr/bin/crafty
 
-COPY ./target/*.jar /usr/local/chesscorp/
+COPY . /usr/local/chesscorp/
 
 RUN /usr/local/chesscorp/src/main/scripts/docker_build.sh
 
@@ -45,4 +45,4 @@ CMD java \
      -Dchesscorp.mail.sender=${CLUB_MAIL_SENDER} \
      -Dchesscorp.mail.baseUrl=${CLUB_BASEURL}    \
      -Dchesscorp.account.validationRequired=${CLUB_VALIDATION_REQ}  \
-     -jar /usr/local/chesscorp/chess-club-*.jar
+     -jar /usr/local/chesscorp/target/chess-club-*.jar

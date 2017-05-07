@@ -1,4 +1,1 @@
-src
-node
-node_modules
-bower_components
+# We don't ignore anything as downloaded files may be used by the image build.
