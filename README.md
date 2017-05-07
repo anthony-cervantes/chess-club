@@ -6,7 +6,7 @@
 ## Build and Run from Source
 
 ```sh
-$ mvn clean package
+$ ./mvnw clean package
 ```
 
 This builds an executable jar file in the target folder.
