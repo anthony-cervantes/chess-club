@@ -10,7 +10,7 @@
     <logger name="org.chesscorp" level="INFO"/>
     <logger name="org.chesscorp.club.monitoring.PerformanceMonitorImpl" level="DEBUG"/>
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
