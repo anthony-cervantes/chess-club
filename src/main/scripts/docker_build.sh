@@ -10,3 +10,5 @@ then
 else
 	./mvnw -Ppostgresql -DskipTests=true clean package
 fi
+
+docker build -t chesscorp/chess-club .
