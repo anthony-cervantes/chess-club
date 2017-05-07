@@ -148,7 +148,7 @@
 
         <resources>
             <resource>
-                <directory>dist</directory>
+                <directory>target/www</directory>
                 <targetPath>static</targetPath>
             </resource>
             <resource>
