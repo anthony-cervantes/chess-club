@@ -1,4 +1,4 @@
-#  [![Build Status][travis-image]][travis-url] [![Technical debt][sonar-quality-badge]][sonar-quality-url] [![Coverage][sonar-coverage-badge]][sonar-coverage-url] [![Coverage Status](https://coveralls.io/repos/ChessCorp/chess-club/badge.svg?branch=master&service=github)](https://coveralls.io/github/ChessCorp/chess-club?branch=master) [![Docker Pulls](https://img.shields.io/docker/pulls/chesscorp/chess-club.svg)](https://hub.docker.com/r/chesscorp/chess-club/)
+#  [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Docker Pulls][dockerpulls-image]][dockerpulls-url]
 
 
 > Chess Server that will provide restful APIs and a complete Web UI.
@@ -79,6 +79,10 @@ MIT © [Yannick Kirschhoffer](http://www.alcibiade.org/)
 
 [travis-image]: https://travis-ci.org/ChessCorp/chess-club.svg?branch=master
 [travis-url]: https://travis-ci.org/ChessCorp/chess-club
+[coveralls-image]: https://coveralls.io/repos/ChessCorp/chess-club/badge.svg?branch=master&service=github
+[coveralls-url]: https://coveralls.io/github/ChessCorp/chess-club?branch=master
+[dockerpulls-image]: https://img.shields.io/docker/pulls/chesscorp/chess-club.svg
+[dockerpulls-url]: https://hub.docker.com/r/chesscorp/chess-club/
 [sonar-coverage-badge]: https://img.shields.io/sonar/https/sonarqube.com/org.chesscorp:chess-club/coverage.svg
 [sonar-coverage-url]: https://sonarqube.com/overview/coverage?id=org.chesscorp:chess-club
 [sonar-quality-badge]: https://img.shields.io/sonar/https/sonarqube.com/org.chesscorp:chess-club/tech_debt.svg
